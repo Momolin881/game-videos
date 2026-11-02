@@ -44,12 +44,24 @@
     position: relative;
     overflow: hidden;
   }
+  .hero-art{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 35%;
+    filter: invert(1);
+    opacity: 0.25;
+    pointer-events: none;
+  }
   .hero::before{
     content:"";
     position:absolute; inset:0;
     background:
       radial-gradient(ellipse 620px 320px at 14% 0%, rgba(226,32,44,0.30), transparent 60%),
-      radial-gradient(ellipse 620px 360px at 86% 10%, rgba(26,79,180,0.26), transparent 60%);
+      radial-gradient(ellipse 620px 360px at 86% 10%, rgba(26,79,180,0.26), transparent 60%),
+      linear-gradient(to bottom, rgba(10,10,12,0.35), var(--black) 92%);
     pointer-events:none;
   }
   .hero::after{
@@ -127,7 +139,7 @@
     font-style: italic;
     font-size: 18px;
     letter-spacing: 0.04em;
-    color: var(--on-black-dim);
+    color: var(--blue);
     margin: 0 0 22px;
     padding-left: 14px;
     border-left: 2px solid var(--blue);
@@ -243,12 +255,12 @@
     font-weight: 500;
     padding: 6px 13px;
     border-radius: 999px;
-    border: 1px solid var(--line-strong);
+    border: 1px solid rgba(26,79,180,0.32);
     background: #fff;
-    color: var(--text-dim);
+    color: var(--blue-dim);
     cursor: pointer;
   }
-  .day-jump:hover{ border-color: var(--red-dim); color: var(--red); }
+  .day-jump:hover{ border-color: var(--blue); background: var(--blue-soft); }
   .day-jump.is-latest{ border-color: var(--red); color: var(--red); font-weight: 700; }
 
   /* ---- roster (players for this clip) — lives inside the dark modal ---- */
@@ -315,11 +327,12 @@
     box-shadow: 0 1px 2px rgba(10,12,16,0.05);
     cursor: pointer;
     flex-shrink: 0;
-    transition: box-shadow 0.15s, transform 0.15s;
+    transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
   }
   .card:hover{
     box-shadow: 0 10px 24px -10px rgba(10,12,16,0.28);
     transform: translateY(-2px);
+    border-color: var(--blue);
   }
 
   .card img{
@@ -508,7 +521,7 @@
     padding: 0;
   }
   .goal-x:hover{ background: rgba(0,0,0,0.35); }
-  .goals-add{ display: flex; gap: 8px; }
+  .goals-add{ display: flex; flex-wrap: wrap; gap: 8px; }
   .goals-input{
     width: 84px;
     border: 1px solid var(--on-black-line);
@@ -532,6 +545,21 @@
     font-family: 'Noto Sans TC', sans-serif;
   }
   .goals-add-btn:hover{ background: var(--red); color: #fff; }
+  .quickmark-btn{
+    border: 0;
+    background: var(--blue);
+    color: #fff;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .quickmark-btn:hover{ box-shadow: 0 4px 14px -4px rgba(26,79,180,0.8); }
+  .quickmark-btn:active{ transform: scale(0.96); }
   .goals-hint{
     font-size: 11px;
     color: var(--on-black-dim);
@@ -561,6 +589,7 @@
 </style>
 
 <div class="hero">
+  <img class="hero-art" src="hero-court.jpg" alt="">
   <div class="navbar">
     <div class="wordmark">河濱<span class="dot">●</span>NBA</div>
     <div class="season">2026 SEASON</div>
@@ -761,9 +790,10 @@
   function setupGoals(fileId, videoEl){
     goalsPanel.innerHTML =
       '<div class="modal-panel-label">進球時間軸</div>' +
-      '<div class="goals-hint">看到進球的當下按 <b>G</b> 鍵，自動往前抓 ' + QUICK_MARK_BACKTRACK_SECONDS + ' 秒標記、並讓你直接打上是誰進的。</div>' +
+      '<div class="goals-hint">到進球的當下點上面這顆按鈕，或手動輸入，並打上是誰進的。</div>' +
       '<div class="goals-chips"></div>' +
       '<div class="goals-add">' +
+        '<button type="button" class="quickmark-btn" title="自動往前抓 ' + QUICK_MARK_BACKTRACK_SECONDS + ' 秒">⚽ 進球</button>' +
         '<input class="goals-input" placeholder="mm:ss" />' +
         '<button type="button" class="goals-add-btn">+ 手動輸入時間</button>' +
       '</div>';
@@ -772,6 +802,7 @@
     var chipsEl = goalsPanel.querySelector('.goals-chips');
     var inputEl = goalsPanel.querySelector('.goals-input');
     var addBtn = goalsPanel.querySelector('.goals-add-btn');
+    var quickBtn = goalsPanel.querySelector('.quickmark-btn');
     var marks = [];
 
     function render(){
@@ -792,6 +823,10 @@
       marks.sort(function(a,b){ return a.t - b.t; });
       render();
       apiPost('addGoal', { fileId: fileId, t: t, scorer: '' }).catch(function(){});
+      requestAnimationFrame(function(){
+        var input = chipsEl.querySelector('.goal-scorer-input[data-t="' + mark.t + '"]');
+        if(input) input.focus();
+      });
       return mark;
     }
 
@@ -841,16 +876,12 @@
     addBtn.addEventListener('click', addFromInput);
     inputEl.addEventListener('keydown', function(e){ if(e.key === 'Enter') addFromInput(); });
 
-    activeGoalsController = {
-      quickMark: function(){
-        var mark = addMark(videoEl.currentTime - QUICK_MARK_BACKTRACK_SECONDS);
-        if(!mark) return;
-        requestAnimationFrame(function(){
-          var input = chipsEl.querySelector('.goal-scorer-input[data-t="' + mark.t + '"]');
-          if(input) input.focus();
-        });
-      }
-    };
+    function quickMark(){
+      addMark(videoEl.currentTime - QUICK_MARK_BACKTRACK_SECONDS);
+    }
+
+    quickBtn.addEventListener('click', quickMark);
+    activeGoalsController = { quickMark: quickMark };
   }
 
   function openPlayer(file){
