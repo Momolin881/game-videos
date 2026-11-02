@@ -271,25 +271,44 @@
   /* ---- roster (players for this clip) — lives inside the dark modal ---- */
   #rosterPanel{ color: var(--on-black); }
   #rosterPanel[hidden]{ display: none; }
-  .roster{
+  .roster-team{
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 6px;
+    margin-bottom: 6px;
   }
+  .roster-team:last-child{ margin-bottom: 0; }
+  .team-label{
+    font-family: 'Teko', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    width: 38px;
+    flex-shrink: 0;
+  }
+  .team-label-red{ color: #ff8e92; }
+  .team-label-blue{ color: #8fb4f0; }
   .roster-chips{ display: contents; }
   .roster-chip{
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: rgba(26,79,180,0.35);
-    color: #cfe0ff;
     font-size: 12.5px;
     font-weight: 500;
     padding: 4px 6px 4px 11px;
     border-radius: 999px;
-    border: 1px solid rgba(26,79,180,0.55);
     white-space: nowrap;
+  }
+  .roster-chip-red{
+    background: rgba(226,32,44,0.35);
+    color: #ffd1d4;
+    border: 1px solid rgba(226,32,44,0.55);
+  }
+  .roster-chip-blue{
+    background: rgba(26,79,180,0.35);
+    color: #cfe0ff;
+    border: 1px solid rgba(26,79,180,0.55);
   }
   .roster-x{
     border: 0;
@@ -314,7 +333,8 @@
     font-size: 12.5px;
     font-family: 'Noto Sans TC', sans-serif;
   }
-  .roster-input:focus{ outline: none; border-color: var(--blue); }
+  .roster-input-red:focus{ outline: none; border-color: var(--red); }
+  .roster-input-blue:focus{ outline: none; border-color: var(--blue); }
 
   .card-grid{
     display: flex;
@@ -481,7 +501,7 @@
     font-size: 12px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--red);
+    color: var(--on-black);
     margin-bottom: 8px;
   }
   .goals-chips{ display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; min-height: 26px; }
@@ -677,7 +697,7 @@
   // ---- 設定：資料夾、API Key、球員/進球資料後端（Google Apps Script） ----
   var FOLDER_ID = '12qlNZh5gT0dlB01MbUw-SUczqfC0ycKQ';
   var API_KEY = 'AIzaSyB-hXDy6Nekjga9l8qMMHCVhgoZbQOQASE';
-  var SHEETS_API = 'https://script.google.com/macros/s/AKfycby-dEH3QiDtJrfeX1SonudWSk0_EegyH1uedk5J1FeWPYGeMuumud8hnefUjp-AK6SZ/exec';
+  var SHEETS_API = 'https://script.google.com/macros/s/AKfycbw6W5qS0yr4TiT-zR9iHkzv8UfDuN_Qu2tUR1duSwk0I5ZCcVkbC3oypqniPua2t2EE/exec';
 
   function apiGet(action){
     return fetch(SHEETS_API + '?action=' + action).then(function(r){ return r.json(); });
@@ -767,28 +787,23 @@
   }
 
   // ---- 球員名單（每支影片一份，存在 Google 試算表的 players 分頁） ----
-  function setupRoster(fileId){
-    rosterPanel.innerHTML =
-      '<div class="modal-panel-label">本場參與球員</div>' +
-      '<div class="roster"><span class="roster-chips"></span>' +
-      '<input class="roster-input" placeholder="+ 新增球員，按 Enter"></div>';
-    rosterPanel.hidden = false;
+  var TEAMS = [
+    { key: 'red', label: '紅隊' },
+    { key: 'blue', label: '藍隊' }
+  ];
 
-    var chipsEl = rosterPanel.querySelector('.roster-chips');
-    var inputEl = rosterPanel.querySelector('.roster-input');
-    var names = [];
+  function setupRosterTeam(fileId, team, names){
+    var section = rosterPanel.querySelector('.roster-team[data-team="' + team.key + '"]');
+    var chipsEl = section.querySelector('.roster-chips');
+    var inputEl = section.querySelector('.roster-input');
 
     function render(){
       chipsEl.innerHTML = names.map(function(n){
-        return '<span class="roster-chip">' + escapeHtml(n) +
+        return '<span class="roster-chip roster-chip-' + team.key + '">' + escapeHtml(n) +
           '<button type="button" class="roster-x" data-n="' + escapeHtml(n) + '">×</button></span>';
       }).join('');
     }
-
-    apiGet('players').then(function(res){
-      names = (res.ok && res.players && res.players[fileId]) ? res.players[fileId] : [];
-      render();
-    }).catch(function(){});
+    render();
 
     chipsEl.addEventListener('click', function(e){
       var btn = e.target.closest('.roster-x');
@@ -796,7 +811,7 @@
       var removed = btn.getAttribute('data-n');
       names = names.filter(function(n){ return n !== removed; });
       render();
-      apiPost('removePlayer', { fileId: fileId, name: removed }).catch(function(){});
+      apiPost('removePlayer', { fileId: fileId, team: team.key, name: removed }).catch(function(){});
     });
 
     inputEl.addEventListener('keydown', function(e){
@@ -806,9 +821,31 @@
       if(names.indexOf(v) === -1){
         names.push(v);
         render();
-        apiPost('addPlayer', { fileId: fileId, name: v }).catch(function(){});
+        apiPost('addPlayer', { fileId: fileId, team: team.key, name: v }).catch(function(){});
       }
       inputEl.value = '';
+    });
+  }
+
+  function setupRoster(fileId){
+    rosterPanel.innerHTML =
+      '<div class="modal-panel-label">本場參與球員</div>' +
+      TEAMS.map(function(team){
+        return '<div class="roster-team" data-team="' + team.key + '">' +
+          '<span class="team-label team-label-' + team.key + '">' + team.label + '</span>' +
+          '<span class="roster-chips"></span>' +
+          '<input class="roster-input roster-input-' + team.key + '" placeholder="+ 新增，按 Enter">' +
+        '</div>';
+      }).join('');
+    rosterPanel.hidden = false;
+
+    apiGet('players').then(function(res){
+      var data = (res.ok && res.players && res.players[fileId]) || {};
+      TEAMS.forEach(function(team){
+        setupRosterTeam(fileId, team, Array.isArray(data[team.key]) ? data[team.key] : []);
+      });
+    }).catch(function(){
+      TEAMS.forEach(function(team){ setupRosterTeam(fileId, team, []); });
     });
   }
 
@@ -824,7 +861,7 @@
   function setupGoals(fileId, videoEl){
     goalsPanel.innerHTML =
       '<div class="modal-panel-label">進球時間軸</div>' +
-      '<div class="goals-hint">到進球的當下點上面這顆按鈕，或手動輸入，並打上是誰進的。</div>' +
+      '<div class="goals-hint">（選填）進球的當下請點下面藍按鈕註記，或按手動輸入，並打上是誰進的。</div>' +
       '<div class="goals-chips"></div>' +
       '<div class="goals-add">' +
         '<button type="button" class="quickmark-btn" title="自動往前抓 ' + QUICK_MARK_BACKTRACK_SECONDS + ' 秒">⚽ 進球</button>' +
@@ -971,9 +1008,10 @@
       if(!res.ok) return;
       var map = res.players || {};
       contentEl.querySelectorAll('.card').forEach(function(card){
-        var names = map[card.getAttribute('data-fileid')];
+        var entry = map[card.getAttribute('data-fileid')];
+        var names = entry ? [].concat(entry.red || [], entry.blue || []) : [];
         var tag = card.querySelector('.players-tag');
-        if(tag) tag.textContent = (names && names.length) ? names.join('、') : '';
+        if(tag) tag.textContent = names.length ? names.join('、') : '';
       });
     }).catch(function(){});
   }
