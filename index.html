@@ -1,0 +1,606 @@
+<title>2026河濱NBA季後賽</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --black: #0a0a0c;
+    --black-2: #15161a;
+    --on-black: #f5f6f7;
+    --on-black-dim: #9ba1aa;
+    --on-black-line: rgba(255,255,255,0.14);
+
+    --bg: #eef0f3;
+    --surface: #ffffff;
+    --line: rgba(10,12,16,0.09);
+    --line-strong: rgba(10,12,16,0.16);
+    --text: #121316;
+    --text-dim: #585e66;
+    --text-faint: #8a8f98;
+
+    --red: #e2202c;
+    --red-dim: #a8141e;
+    --red-soft: rgba(226,32,44,0.14);
+    --blue: #1a4fb4;
+    --blue-dim: #123a87;
+    --blue-soft: rgba(26,79,180,0.12);
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+    min-height: 100vh;
+  }
+
+  a{ color: inherit; }
+
+  /* ================= HERO / BLACK BAND ================= */
+  .hero{
+    background: var(--black);
+    color: var(--on-black);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      radial-gradient(ellipse 620px 320px at 14% 0%, rgba(226,32,44,0.30), transparent 60%),
+      radial-gradient(ellipse 620px 360px at 86% 10%, rgba(26,79,180,0.26), transparent 60%);
+    pointer-events:none;
+  }
+  .hero::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:0; height:120px;
+    background: repeating-linear-gradient(90deg, transparent 0 109px, rgba(255,255,255,0.045) 109px 110px);
+    mask-image: linear-gradient(to top, black, transparent);
+    pointer-events:none;
+  }
+
+  .navbar{
+    position: relative;
+    z-index: 1;
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--on-black-line);
+  }
+  .wordmark{
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-family: 'Teko', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    font-size: 22px;
+  }
+  .wordmark .dot{ color: var(--red); }
+  .navbar .season{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: var(--on-black-dim);
+  }
+
+  .hero-body{
+    position: relative;
+    z-index: 1;
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 56px 24px 64px;
+  }
+
+  .eyebrow{
+    font-family: 'Teko', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--red);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .eyebrow::before{ content:""; width:26px; height:2px; background: var(--red-dim); }
+
+  h1{
+    font-weight: 900;
+    font-size: clamp(34px, 6vw, 56px);
+    line-height: 1.06;
+    letter-spacing: -0.01em;
+    margin: 0 0 18px;
+    text-wrap: balance;
+    color: var(--on-black);
+  }
+  h1 .accent-char{ color: var(--red); }
+
+  .tagline{
+    font-family: 'Teko', sans-serif;
+    font-weight: 500;
+    font-style: italic;
+    font-size: 18px;
+    letter-spacing: 0.04em;
+    color: var(--on-black-dim);
+    margin: 0 0 22px;
+    padding-left: 14px;
+    border-left: 2px solid var(--blue);
+  }
+
+  .lede{
+    font-size: 15.5px;
+    line-height: 1.8;
+    color: var(--on-black-dim);
+    max-width: 58ch;
+    margin: 0;
+  }
+  .lede a{ color: var(--on-black); border-bottom: 1px solid var(--on-black-dim); text-decoration: none; }
+  .lede a:hover{ color: var(--red); border-color: var(--red); }
+
+  /* ================= BODY ================= */
+  .page{
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 40px 24px 72px;
+  }
+
+  #status{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 22px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--text-dim);
+    font-size: 14px;
+    box-shadow: 0 1px 2px rgba(10,12,16,0.04);
+  }
+  #status.hidden{ display:none; }
+  .spin{
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid var(--line-strong);
+    border-top-color: var(--red);
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce){ .spin{ animation: none; } }
+
+  .setup-note{
+    padding: 22px 24px;
+    background: #fff;
+    border: 1px dashed var(--line-strong);
+    border-radius: 12px;
+    color: var(--text-dim);
+    font-size: 13.5px;
+    line-height: 1.9;
+  }
+  .setup-note b{ color: var(--text); }
+  .setup-note a{ color: var(--red); }
+
+  /* ---- day groups ---- */
+  .day-group{ margin-bottom: 40px; }
+  .day-overline{
+    font-family: 'Teko', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 4px;
+  }
+  .day-head{
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line-strong);
+  }
+  .day-num{
+    font-family: 'Teko', sans-serif;
+    font-weight: 600;
+    font-size: 32px;
+    color: var(--text);
+    line-height: 1;
+  }
+  .day-label{ font-weight: 700; font-size: 14.5px; color: var(--text-dim); }
+  .day-count{
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+  }
+
+  .card-grid{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .card{
+    position: relative;
+    height: 176px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid var(--line);
+    box-shadow: 0 1px 2px rgba(10,12,16,0.05);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .card:hover{
+    box-shadow: 0 10px 24px -10px rgba(10,12,16,0.28);
+    transform: translateY(-2px);
+  }
+
+  .card img{
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    background: linear-gradient(135deg, #e6e8ec, #d8dbe1);
+  }
+
+  .card .scrim{
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(10,10,12,0.82) 0%, rgba(10,10,12,0.05) 42%, transparent 62%);
+  }
+
+  .card .play{
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%) scale(0.9);
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--red);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0;
+    transition: opacity 0.15s, transform 0.15s;
+    box-shadow: 0 6px 18px -4px rgba(226,32,44,0.6);
+  }
+  .card:hover .play{ opacity: 1; transform: translate(-50%,-50%) scale(1); }
+  .card .play svg{ width: 13px; height: 13px; fill: #fff; margin-left: 2px; }
+
+  .card .tag{
+    position: absolute;
+    top: 8px; left: 8px;
+    font-family: 'Teko', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: #fff;
+    background: var(--red);
+    padding: 2px 7px;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px -1px rgba(226,32,44,0.5);
+  }
+
+  .card .info{
+    position: absolute;
+    left: 10px; right: 10px; bottom: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .card .info .dur{ color: rgba(255,255,255,0.8); }
+
+  /* ---- player modal ---- */
+  .modal{
+    position: fixed; inset: 0;
+    background: rgba(5,5,7,0.9);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 28px;
+    z-index: 10;
+  }
+  .modal.open{ display: flex; }
+
+  .modal-box{
+    max-width: min(880px, 100%);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .modal-head{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    color: var(--on-black);
+  }
+  .modal-title{ font-weight: 700; font-size: 15px; }
+  .modal-sub{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: var(--on-black-dim);
+    margin-top: 2px;
+  }
+  .modal-close{
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--black-2);
+    border: 1px solid var(--on-black-line);
+    color: var(--on-black);
+    font-size: 16px;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-close:hover{ border-color: var(--red); color: var(--red); }
+
+  .modal-video-wrap{
+    background: #000;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--on-black-line);
+    box-shadow: 0 30px 70px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(226,32,44,0.15), 0 0 90px -30px rgba(26,79,180,0.3);
+    max-height: 78vh;
+    display: flex;
+    justify-content: center;
+  }
+  .modal-video-wrap video{
+    max-width: 100%;
+    max-height: 78vh;
+    display: block;
+  }
+
+  .meta-row{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line-strong);
+    font-size: 12.5px;
+    color: var(--text-faint);
+  }
+  .meta-row a{ color: var(--red); text-decoration: none; border-bottom: 1px solid var(--red-dim); }
+  .meta-row a:hover{ color: var(--red-dim); }
+
+  @media (max-width: 560px){
+    .hero-body{ padding: 44px 18px 48px; }
+    .page{ padding: 32px 18px 56px; }
+    .card{ height: 136px; }
+  }
+</style>
+
+<div class="hero">
+  <div class="navbar">
+    <div class="wordmark">河濱<span class="dot">●</span>NBA</div>
+    <div class="season">2026 SEASON</div>
+  </div>
+  <div class="hero-body">
+    <div class="eyebrow">2026 · Riverside Playoffs</div>
+    <h1>河濱NBA<span class="accent-char">季後賽</span></h1>
+    <p class="tagline">“ Somewhere Only We Know ”</p>
+    <p class="lede">
+      由駐場記者上傳到<a href="https://drive.google.com/drive/folders/12qlNZh5gT0dlB01MbUw-SUczqfC0ycKQ" target="_blank" rel="noopener">轉播庫</a>裡的每一支影片，依比賽日自動整理在以下頻道清單——馬上開啟最新戰況，點縮圖直接進場觀賽。
+    </p>
+  </div>
+</div>
+
+<div class="page">
+  <div id="status">
+    <span class="spin"></span>
+    <span>暖身中・整理本季賽事…</span>
+  </div>
+
+  <div id="content"></div>
+
+  <div class="meta-row">
+    <span>FULL COURT ARCHIVE・點縮圖進場</span>
+    <span>·</span>
+    <span>手機也能看</span>
+    <span>·</span>
+    <a href="https://drive.google.com/drive/folders/12qlNZh5gT0dlB01MbUw-SUczqfC0ycKQ" target="_blank" rel="noopener">在雲端硬碟開啟原始資料夾 ↗</a>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="modalTitle">—</div>
+        <div class="modal-sub" id="modalSub">—</div>
+      </div>
+      <button class="modal-close" id="modalClose" aria-label="關閉">✕</button>
+    </div>
+    <div class="modal-video-wrap">
+      <video id="modalVideo" controls playsinline></video>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ---- 設定：資料夾與 API Key ----
+  var FOLDER_ID = '12qlNZh5gT0dlB01MbUw-SUczqfC0ycKQ';
+  var API_KEY = 'AIzaSyB-hXDy6Nekjga9l8qMMHCVhgoZbQOQASE';
+
+  var statusEl = document.getElementById('status');
+  var contentEl = document.getElementById('content');
+  var modal = document.getElementById('modal');
+  var modalVideo = document.getElementById('modalVideo');
+  var modalTitle = document.getElementById('modalTitle');
+  var modalSub = document.getElementById('modalSub');
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function fmtDuration(ms){
+    if(!ms) return '';
+    var s = Math.round(ms/1000);
+    var m = Math.floor(s/60);
+    var r = s%60;
+    return m + ':' + (r<10?'0':'') + r;
+  }
+
+  function dayKey(iso){
+    var d = new Date(iso);
+    return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+  }
+
+  function dayLabel(iso){
+    var d = new Date(iso);
+    var md = (d.getMonth()+1) + '.' + d.getDate();
+    var weekday = new Intl.DateTimeFormat('zh-TW', { weekday: 'short' }).format(d);
+    return { num: md, label: d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日 ' + weekday };
+  }
+
+  function showSetupNote(message){
+    statusEl.classList.add('hidden');
+    contentEl.innerHTML =
+      '<div class="setup-note">' +
+        '<b>影片清單還沒連上即時資料。</b><br>' +
+        escapeHtml(message) + '<br><br>' +
+        '在設定完成前，可以先點下方「在雲端硬碟開啟原始資料夾」直接看影片。' +
+      '</div>';
+  }
+
+  function openPlayer(file){
+    if(file.__demo){
+      modalVideo.removeAttribute('src');
+      modalVideo.poster = '';
+      modalVideo.style.aspectRatio = (file.videoMediaMetadata.width) + ' / ' + (file.videoMediaMetadata.height);
+      modalVideo.style.width = (file.videoMediaMetadata.height > file.videoMediaMetadata.width ? '320px' : '100%');
+      modalVideo.style.background = 'repeating-linear-gradient(135deg, #1a1b1f, #1a1b1f 10px, #121317 10px, #121317 20px)';
+    } else {
+      var src = 'https://www.googleapis.com/drive/v3/files/' + file.id + '?alt=media&key=' + API_KEY;
+      modalVideo.src = src;
+    }
+    modalTitle.textContent = file.name + (file.__demo ? '（示範・尚未串接真實影片）' : '');
+    var meta = [];
+    if(file.createdTime) meta.push(dayLabel(file.createdTime).label);
+    if(file.videoMediaMetadata){
+      var w = file.videoMediaMetadata.width, h = file.videoMediaMetadata.height;
+      if(w && h) meta.push(w+'×'+h+'・'+(h>w?'直式':'橫式'));
+      if(file.videoMediaMetadata.durationMillis) meta.push(fmtDuration(file.videoMediaMetadata.durationMillis));
+    }
+    modalSub.textContent = meta.join('・');
+    modal.classList.add('open');
+    modalVideo.play().catch(function(){});
+  }
+
+  function closePlayer(){
+    modal.classList.remove('open');
+    modalVideo.pause();
+    modalVideo.removeAttribute('src');
+    modalVideo.load();
+  }
+
+  document.getElementById('modalClose').addEventListener('click', closePlayer);
+  modal.addEventListener('click', function(e){ if(e.target === modal) closePlayer(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closePlayer(); });
+
+  function renderGroups(files){
+    statusEl.classList.add('hidden');
+
+    if(!files.length){
+      contentEl.innerHTML = '<div class="setup-note">資料夾裡還沒有影片，等球友上傳後重新整理這頁就會出現。</div>';
+      return;
+    }
+
+    var groups = {};
+    files.forEach(function(f){
+      var k = dayKey(f.createdTime);
+      if(!groups[k]) groups[k] = [];
+      groups[k].push(f);
+    });
+    var order = Object.keys(groups).sort(function(a, b){
+      return new Date(groups[b][0].createdTime) - new Date(groups[a][0].createdTime);
+    });
+
+    var latestTime = Math.max.apply(null, files.map(function(f){ return new Date(f.createdTime).getTime(); }));
+
+    var html = '';
+    order.forEach(function(k, gi){
+      var list = groups[k];
+      var dl = dayLabel(list[0].createdTime);
+      var gameNo = String(order.length - gi).padStart(2, '0');
+      html += '<section class="day-group">';
+      html += '<div class="day-overline">Game Day ' + gameNo + '</div>';
+      html += '<div class="day-head"><span class="day-num">' + dl.num + '</span><span class="day-label">' + dl.label + '</span><span class="day-count">' + list.length + ' 支影片</span></div>';
+      html += '<div class="card-grid">';
+      list.forEach(function(f, i){
+        var vmm = f.videoMediaMetadata || {};
+        var w = vmm.width || 16, h = vmm.height || 9;
+        var ratio = w / h;
+        var widthPx = Math.round(176 * ratio);
+        var isLatest = new Date(f.createdTime).getTime() === latestTime;
+        var dur = fmtDuration(vmm.durationMillis);
+        var thumb = f.thumbnailLink || '';
+        html += '<div class="card" style="width:' + widthPx + 'px" data-idx="' + f.__idx + '">';
+        if(thumb){
+          html += '<img src="' + thumb + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">';
+        }
+        html += '<div class="scrim"></div>';
+        if(isLatest){ html += '<span class="tag">最新</span>'; }
+        html += '<div class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>';
+        html += '<div class="info"><span></span><span class="dur">' + dur + '</span></div>';
+        html += '</div>';
+      });
+      html += '</div></section>';
+    });
+
+    contentEl.innerHTML = html;
+
+    contentEl.querySelectorAll('.card').forEach(function(el){
+      el.addEventListener('click', function(){
+        openPlayer(files[parseInt(el.getAttribute('data-idx'), 10)]);
+      });
+    });
+  }
+
+  // 示範資料：直式先略過，等接上真實資料、系統偵測到直式影片時會自動以正確比例出現
+  var MOCK_FILES = [
+    { id:'demo1', name:'20261026_184248.mp4', createdTime:'2026-10-26T18:42:48+08:00', videoMediaMetadata:{ width:1920, height:1080, durationMillis:125000 }, __demo:true },
+    { id:'demo2', name:'20261026_185803.mp4', createdTime:'2026-10-26T18:58:03+08:00', videoMediaMetadata:{ width:1920, height:1080, durationMillis:88000 }, __demo:true },
+    { id:'demo3', name:'20261031_183022.mp4', createdTime:'2026-10-31T18:30:22+08:00', videoMediaMetadata:{ width:1920, height:1080, durationMillis:210000 }, __demo:true },
+    { id:'demo4', name:'20261101_180202.mp4', createdTime:'2026-11-01T18:02:02+08:00', videoMediaMetadata:{ width:1920, height:1080, durationMillis:95000 }, __demo:true },
+    { id:'demo5', name:'20261101_185923.mp4', createdTime:'2026-11-01T18:59:23+08:00', videoMediaMetadata:{ width:1080, height:1920, durationMillis:60000 }, __demo:true },
+    { id:'demo6', name:'20261101_190501.mp4', createdTime:'2026-11-01T19:05:01+08:00', videoMediaMetadata:{ width:1920, height:1080, durationMillis:143000 }, __demo:true }
+  ];
+
+  if(!API_KEY || API_KEY === 'YOUR_API_KEY_HERE'){
+    MOCK_FILES.forEach(function(f, i){ f.__idx = i; });
+    renderGroups(MOCK_FILES);
+    contentEl.insertAdjacentHTML('afterbegin', '<div class="setup-note" style="margin-bottom:26px"><b>目前顯示示範版面。</b>管理員貼上 Drive API Key 後，會自動換成即時賽事資料。</div>');
+    return;
+  }
+
+  var fields = 'files(id,name,createdTime,mimeType,videoMediaMetadata,thumbnailLink)';
+  var q = encodeURIComponent("'" + FOLDER_ID + "' in parents and mimeType contains 'video/' and trashed = false");
+  var url = 'https://www.googleapis.com/drive/v3/files?q=' + q + '&fields=' + encodeURIComponent(fields) + '&orderBy=createdTime desc&pageSize=200&key=' + API_KEY;
+
+  fetch(url)
+    .then(function(r){
+      if(!r.ok) return r.json().then(function(j){ throw new Error((j.error && j.error.message) || ('HTTP ' + r.status)); });
+      return r.json();
+    })
+    .then(function(data){
+      var files = data.files || [];
+      files.forEach(function(f, i){ f.__idx = i; });
+      renderGroups(files);
+    })
+    .catch(function(err){
+      showSetupNote('讀取失敗：' + err.message);
+    });
+})();
+</script>
