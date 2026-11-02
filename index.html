@@ -452,13 +452,24 @@
     return m + ':' + (r<10?'0':'') + r;
   }
 
-  function dayKey(iso){
-    var d = new Date(iso);
+  // 優先從檔名解析實際錄製時間（手機相機命名格式 YYYYMMDD_HHMMSS），
+  // 這樣分組才會照「比賽當天」而不是「雲端硬碟上傳完成的時間」。
+  // 檔名格式不符合時，退回用 Drive 的建立時間。
+  function recordedTime(file){
+    var m = /^(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})/.exec(file.name);
+    if(m){
+      return new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]).getTime();
+    }
+    return new Date(file.createdTime).getTime();
+  }
+
+  function dayKey(ts){
+    var d = new Date(ts);
     return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
   }
 
-  function dayLabel(iso){
-    var d = new Date(iso);
+  function dayLabel(ts){
+    var d = new Date(ts);
     var md = (d.getMonth()+1) + '.' + d.getDate();
     var weekday = new Intl.DateTimeFormat('zh-TW', { weekday: 'short' }).format(d);
     return { num: md, label: d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日 ' + weekday };
@@ -487,7 +498,7 @@
     }
     modalTitle.textContent = file.name + (file.__demo ? '（示範・尚未串接真實影片）' : '');
     var meta = [];
-    if(file.createdTime) meta.push(dayLabel(file.createdTime).label);
+    meta.push(dayLabel(file.__ts).label);
     if(file.videoMediaMetadata){
       var w = file.videoMediaMetadata.width, h = file.videoMediaMetadata.height;
       if(w && h) meta.push(w+'×'+h+'・'+(h>w?'直式':'橫式'));
@@ -519,20 +530,20 @@
 
     var groups = {};
     files.forEach(function(f){
-      var k = dayKey(f.createdTime);
+      var k = dayKey(f.__ts);
       if(!groups[k]) groups[k] = [];
       groups[k].push(f);
     });
     var order = Object.keys(groups).sort(function(a, b){
-      return new Date(groups[b][0].createdTime) - new Date(groups[a][0].createdTime);
+      return groups[b][0].__ts - groups[a][0].__ts;
     });
 
-    var latestTime = Math.max.apply(null, files.map(function(f){ return new Date(f.createdTime).getTime(); }));
+    var latestTime = Math.max.apply(null, files.map(function(f){ return f.__ts; }));
 
     var html = '';
     order.forEach(function(k, gi){
-      var list = groups[k];
-      var dl = dayLabel(list[0].createdTime);
+      var list = groups[k].slice().sort(function(a, b){ return b.__ts - a.__ts; });
+      var dl = dayLabel(list[0].__ts);
       var gameNo = String(order.length - gi).padStart(2, '0');
       html += '<section class="day-group">';
       html += '<div class="day-overline">Game Day ' + gameNo + '</div>';
@@ -543,7 +554,7 @@
         var w = vmm.width || 16, h = vmm.height || 9;
         var ratio = w / h;
         var widthPx = Math.round(176 * ratio);
-        var isLatest = new Date(f.createdTime).getTime() === latestTime;
+        var isLatest = f.__ts === latestTime;
         var dur = fmtDuration(vmm.durationMillis);
         var thumb = f.thumbnailLink || '';
         html += '<div class="card" style="width:' + widthPx + 'px" data-idx="' + f.__idx + '">';
@@ -579,7 +590,7 @@
   ];
 
   if(!API_KEY || API_KEY === 'YOUR_API_KEY_HERE'){
-    MOCK_FILES.forEach(function(f, i){ f.__idx = i; });
+    MOCK_FILES.forEach(function(f, i){ f.__idx = i; f.__ts = recordedTime(f); });
     renderGroups(MOCK_FILES);
     contentEl.insertAdjacentHTML('afterbegin', '<div class="setup-note" style="margin-bottom:26px"><b>目前顯示示範版面。</b>管理員貼上 Drive API Key 後，會自動換成即時賽事資料。</div>');
     return;
@@ -596,7 +607,7 @@
     })
     .then(function(data){
       var files = data.files || [];
-      files.forEach(function(f, i){ f.__idx = i; });
+      files.forEach(function(f, i){ f.__idx = i; f.__ts = recordedTime(f); });
       renderGroups(files);
     })
     .catch(function(err){
