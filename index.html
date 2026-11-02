@@ -320,6 +320,7 @@
   .card{
     position: relative;
     height: 176px;
+    max-width: 100%;
     border-radius: 8px;
     overflow: hidden;
     background: #fff;
@@ -582,9 +583,35 @@
   .meta-row a:hover{ color: var(--red-dim); }
 
   @media (max-width: 560px){
+    .navbar .season{ font-size: 12px; }
     .hero-body{ padding: 44px 18px 48px; }
+    .eyebrow{ font-size: 17px; }
+    .lede{ font-size: 16.5px; line-height: 1.85; }
+
     .page{ padding: 32px 18px 56px; }
-    .card{ height: 136px; }
+    .day-jump{ font-size: 14px; padding: 8px 15px; }
+    .day-num{ font-size: 36px; }
+    .day-label{ font-size: 16px; }
+    .day-count{ font-size: 12.5px; }
+    .day-toggle{ font-size: 12px; }
+
+    .card-grid{ flex-direction: column; gap: 16px; }
+    .card{ width: 100% !important; height: auto; }
+    .card .info{ font-size: 13px; }
+    .card .players-tag{ font-size: 13.5px; }
+    .card .tag{ font-size: 13px; }
+
+    .meta-row{ font-size: 13.5px; }
+
+    .modal{ padding: 14px; }
+    .modal-title{ font-size: 16px; }
+    .modal-sub{ font-size: 12.5px; }
+    .modal-panel-label{ font-size: 13px; }
+    .goals-hint{ font-size: 12.5px; }
+    .roster-chip, .goal-chip{ font-size: 14px; }
+    .roster-input, .goals-input, .goal-scorer-input{ font-size: 14px; }
+    .quickmark-btn, .goals-add-btn{ font-size: 14px; padding: 9px 14px; }
+    .roster-x, .goal-x{ width: 18px; height: 18px; font-size: 12px; }
   }
 </style>
 
@@ -885,13 +912,19 @@
   }
 
   function openPlayer(file){
+    // 先用已知的影片尺寸把播放框的比例撐好，避免瀏覽器在真正讀到串流前
+    // 用預設的小尺寸（約 300×150）顯示，造成畫面被壓扁、兩側留大片黑邊。
+    var vmmInit = file.videoMediaMetadata || {};
+    modalVideo.style.aspectRatio = (vmmInit.width || 16) + ' / ' + (vmmInit.height || 9);
+    modalVideo.style.width = (vmmInit.height > vmmInit.width ? 'auto' : '100%');
+    modalVideo.style.height = (vmmInit.height > vmmInit.width ? '100%' : 'auto');
+
     if(file.__demo){
       modalVideo.removeAttribute('src');
       modalVideo.poster = '';
-      modalVideo.style.aspectRatio = (file.videoMediaMetadata.width) + ' / ' + (file.videoMediaMetadata.height);
-      modalVideo.style.width = (file.videoMediaMetadata.height > file.videoMediaMetadata.width ? '320px' : '100%');
       modalVideo.style.background = 'repeating-linear-gradient(135deg, #1a1b1f, #1a1b1f 10px, #121317 10px, #121317 20px)';
     } else {
+      modalVideo.style.background = '#000';
       var src = 'https://www.googleapis.com/drive/v3/files/' + file.id + '?alt=media&key=' + API_KEY;
       modalVideo.src = src;
     }
@@ -969,7 +1002,10 @@
     });
 
     var latestTime = Math.max.apply(null, files.map(function(f){ return f.__ts; }));
-    var EXPANDED_BY_DEFAULT = 2;
+    var EXPANDED_BY_DEFAULT = 1;
+    // 桌機版用這個基準算每張卡片的寬度（列高固定、寬度照比例）；
+    // 手機版改成單欄滿版、用 aspect-ratio 算高度，這個值在手機上不會用到。
+    var CARD_HEIGHT = 176;
 
     var jumpsHtml = '';
     if(order.length > 1){
@@ -995,11 +1031,11 @@
         var vmm = f.videoMediaMetadata || {};
         var w = vmm.width || 16, h = vmm.height || 9;
         var ratio = w / h;
-        var widthPx = Math.round(176 * ratio);
+        var widthPx = Math.round(CARD_HEIGHT * ratio);
         var isLatest = f.__ts === latestTime;
         var dur = fmtDuration(vmm.durationMillis);
         var thumb = f.thumbnailLink || '';
-        html += '<div class="card" style="width:' + widthPx + 'px" data-idx="' + f.__idx + '" data-fileid="' + escapeHtml(f.id) + '">';
+        html += '<div class="card" style="width:' + widthPx + 'px; aspect-ratio:' + w + '/' + h + '" data-idx="' + f.__idx + '" data-fileid="' + escapeHtml(f.id) + '">';
         if(thumb){
           html += '<img src="' + thumb + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">';
         }
