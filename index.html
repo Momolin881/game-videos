@@ -196,13 +196,16 @@
     color: var(--red);
     margin-bottom: 4px;
   }
+  .day-group{ scroll-margin-top: 20px; }
   .day-head{
     display: flex;
     align-items: baseline;
     gap: 12px;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
     padding-bottom: 10px;
     border-bottom: 1px solid var(--line-strong);
+    cursor: pointer;
+    user-select: none;
   }
   .day-num{
     font-family: 'Teko', sans-serif;
@@ -218,6 +221,83 @@
     font-size: 11px;
     color: var(--text-faint);
   }
+  .day-toggle{
+    font-size: 11px;
+    color: var(--text-faint);
+    transition: transform 0.15s;
+    flex-shrink: 0;
+  }
+  .day-group.collapsed .day-toggle{ transform: rotate(-90deg); }
+  .day-group.collapsed .card-grid{ display: none; }
+
+  /* ---- quick jump to a game day ---- */
+  .day-jumps{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+  .day-jump{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 13px;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: #fff;
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+  .day-jump:hover{ border-color: var(--red-dim); color: var(--red); }
+  .day-jump.is-latest{ border-color: var(--red); color: var(--red); font-weight: 700; }
+
+  /* ---- roster (players for this clip) — lives inside the dark modal ---- */
+  #rosterPanel{ color: var(--on-black); }
+  #rosterPanel[hidden]{ display: none; }
+  .roster{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .roster-chips{ display: contents; }
+  .roster-chip{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(26,79,180,0.35);
+    color: #cfe0ff;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 4px 6px 4px 11px;
+    border-radius: 999px;
+    border: 1px solid rgba(26,79,180,0.55);
+    white-space: nowrap;
+  }
+  .roster-x{
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    width: 15px; height: 15px;
+    border-radius: 50%;
+    font-size: 11px;
+    line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+  }
+  .roster-x:hover{ background: rgba(0,0,0,0.35); }
+  .roster-input{
+    width: 132px;
+    border: 1px solid var(--on-black-line);
+    background: var(--black-2);
+    color: var(--on-black);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12.5px;
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+  .roster-input:focus{ outline: none; border-color: var(--blue); }
 
   .card-grid{
     display: flex;
@@ -291,9 +371,22 @@
     color: #fff;
     display: flex;
     justify-content: space-between;
+    align-items: flex-end;
     gap: 8px;
   }
-  .card .info .dur{ color: rgba(255,255,255,0.8); }
+  .card .info .players-tag{
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 700;
+    font-size: 11.5px;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .card .info .dur{ color: rgba(255,255,255,0.8); flex: 0 0 auto; }
 
   /* ---- player modal ---- */
   .modal{
@@ -310,6 +403,8 @@
   .modal-box{
     max-width: min(880px, 100%);
     width: 100%;
+    max-height: 92vh;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -347,15 +442,102 @@
     overflow: hidden;
     border: 1px solid var(--on-black-line);
     box-shadow: 0 30px 70px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(226,32,44,0.15), 0 0 90px -30px rgba(26,79,180,0.3);
-    max-height: 78vh;
+    max-height: 42vh;
     display: flex;
     justify-content: center;
   }
   .modal-video-wrap video{
     max-width: 100%;
-    max-height: 78vh;
+    max-height: 42vh;
     display: block;
   }
+
+  /* ---- goal timeline (inside modal) ---- */
+  #goalsPanel{ color: var(--on-black); }
+  #goalsPanel[hidden]{ display: none; }
+  .modal-panel-label,
+  .goals-label{
+    font-family: 'Teko', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 8px;
+  }
+  .goals-chips{ display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; min-height: 26px; }
+  .goal-chip{
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    background: var(--red-soft);
+    color: #ffd9db;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 4px 4px 11px;
+    border-radius: 999px;
+    border: 1px solid rgba(226,32,44,0.4);
+  }
+  .goal-time{ cursor: pointer; white-space: nowrap; }
+  .goal-time:hover{ text-decoration: underline; }
+  .goal-scorer-input{
+    width: 64px;
+    border: 0;
+    border-left: 1px solid rgba(226,32,44,0.4);
+    background: transparent;
+    color: #fff;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 11.5px;
+    font-weight: 500;
+    padding: 0 4px 0 8px;
+    margin-left: 4px;
+  }
+  .goal-scorer-input::placeholder{ color: rgba(255,217,219,0.55); }
+  .goal-scorer-input:focus{ outline: none; }
+  .goal-x{
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    width: 15px; height: 15px;
+    border-radius: 50%;
+    font-size: 11px;
+    line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+  }
+  .goal-x:hover{ background: rgba(0,0,0,0.35); }
+  .goals-add{ display: flex; gap: 8px; }
+  .goals-input{
+    width: 84px;
+    border: 1px solid var(--on-black-line);
+    background: var(--black-2);
+    color: var(--on-black);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+  }
+  .goals-input:focus{ outline: none; border-color: var(--red); }
+  .goals-add-btn{
+    border: 1px solid var(--red-dim);
+    background: transparent;
+    color: var(--red);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+  .goals-add-btn:hover{ background: var(--red); color: #fff; }
+  .goals-hint{
+    font-size: 11px;
+    color: var(--on-black-dim);
+    margin: -2px 0 10px;
+  }
+  .goals-hint b{ color: #ffb3b8; }
 
   .meta-row{
     display: flex;
@@ -422,14 +604,29 @@
     <div class="modal-video-wrap">
       <video id="modalVideo" controls playsinline></video>
     </div>
+    <div id="rosterPanel" hidden></div>
+    <div id="goalsPanel" hidden></div>
   </div>
 </div>
 
 <script>
 (function(){
-  // ---- 設定：資料夾與 API Key ----
+  // ---- 設定：資料夾、API Key、球員/進球資料後端（Google Apps Script） ----
   var FOLDER_ID = '12qlNZh5gT0dlB01MbUw-SUczqfC0ycKQ';
   var API_KEY = 'AIzaSyB-hXDy6Nekjga9l8qMMHCVhgoZbQOQASE';
+  var SHEETS_API = 'https://script.google.com/macros/s/AKfycby-dEH3QiDtJrfeX1SonudWSk0_EegyH1uedk5J1FeWPYGeMuumud8hnefUjp-AK6SZ/exec';
+
+  function apiGet(action){
+    return fetch(SHEETS_API + '?action=' + action).then(function(r){ return r.json(); });
+  }
+  function apiPost(action, body){
+    var payload = Object.assign({ action: action }, body);
+    return fetch(SHEETS_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    }).then(function(r){ return r.json(); });
+  }
 
   var statusEl = document.getElementById('status');
   var contentEl = document.getElementById('content');
@@ -437,6 +634,8 @@
   var modalVideo = document.getElementById('modalVideo');
   var modalTitle = document.getElementById('modalTitle');
   var modalSub = document.getElementById('modalSub');
+  var rosterPanel = document.getElementById('rosterPanel');
+  var goalsPanel = document.getElementById('goalsPanel');
 
   function escapeHtml(s){
     return String(s).replace(/[&<>"']/g, function(c){
@@ -450,6 +649,25 @@
     var m = Math.floor(s/60);
     var r = s%60;
     return m + ':' + (r<10?'0':'') + r;
+  }
+
+  function fmtSeconds(t){
+    t = Math.max(0, Math.round(t));
+    var m = Math.floor(t/60), s = t%60;
+    return m + ':' + (s<10?'0':'') + s;
+  }
+
+  function parseTimeInput(str){
+    str = (str || '').trim();
+    if(!str) return null;
+    if(/^\d+:\d{1,2}$/.test(str)){
+      var parts = str.split(':');
+      var secs = parseInt(parts[1], 10);
+      if(secs > 59) return null;
+      return parseInt(parts[0], 10) * 60 + secs;
+    }
+    if(/^\d+$/.test(str)) return parseInt(str, 10);
+    return null;
   }
 
   // 優先從檔名解析實際錄製時間（手機相機命名格式 YYYYMMDD_HHMMSS），
@@ -485,6 +703,156 @@
       '</div>';
   }
 
+  // ---- 球員名單（每支影片一份，存在 Google 試算表的 players 分頁） ----
+  function setupRoster(fileId){
+    rosterPanel.innerHTML =
+      '<div class="modal-panel-label">本場參與球員</div>' +
+      '<div class="roster"><span class="roster-chips"></span>' +
+      '<input class="roster-input" placeholder="+ 新增球員，按 Enter"></div>';
+    rosterPanel.hidden = false;
+
+    var chipsEl = rosterPanel.querySelector('.roster-chips');
+    var inputEl = rosterPanel.querySelector('.roster-input');
+    var names = [];
+
+    function render(){
+      chipsEl.innerHTML = names.map(function(n){
+        return '<span class="roster-chip">' + escapeHtml(n) +
+          '<button type="button" class="roster-x" data-n="' + escapeHtml(n) + '">×</button></span>';
+      }).join('');
+    }
+
+    apiGet('players').then(function(res){
+      names = (res.ok && res.players && res.players[fileId]) ? res.players[fileId] : [];
+      render();
+    }).catch(function(){});
+
+    chipsEl.addEventListener('click', function(e){
+      var btn = e.target.closest('.roster-x');
+      if(!btn) return;
+      var removed = btn.getAttribute('data-n');
+      names = names.filter(function(n){ return n !== removed; });
+      render();
+      apiPost('removePlayer', { fileId: fileId, name: removed }).catch(function(){});
+    });
+
+    inputEl.addEventListener('keydown', function(e){
+      if(e.key !== 'Enter') return;
+      var v = inputEl.value.trim();
+      if(!v) return;
+      if(names.indexOf(v) === -1){
+        names.push(v);
+        render();
+        apiPost('addPlayer', { fileId: fileId, name: v }).catch(function(){});
+      }
+      inputEl.value = '';
+    });
+  }
+
+  // 快捷鍵抓進球時的「目前正在開著的進球控制器」——同一時間只會有一支影片在播放
+  var activeGoalsController = null;
+  var QUICK_MARK_BACKTRACK_SECONDS = 3;
+
+  function normalizeMark(m){
+    return (typeof m === 'number') ? { t: m, scorer: '' } : { t: m.t, scorer: m.scorer || '' };
+  }
+
+  // ---- 進球時間軸（每支影片一份，存在 Google 試算表的 goals 分頁） ----
+  function setupGoals(fileId, videoEl){
+    goalsPanel.innerHTML =
+      '<div class="modal-panel-label">進球時間軸</div>' +
+      '<div class="goals-hint">看到進球的當下按 <b>G</b> 鍵，自動往前抓 ' + QUICK_MARK_BACKTRACK_SECONDS + ' 秒標記、並讓你直接打上是誰進的。</div>' +
+      '<div class="goals-chips"></div>' +
+      '<div class="goals-add">' +
+        '<input class="goals-input" placeholder="mm:ss" />' +
+        '<button type="button" class="goals-add-btn">+ 手動輸入時間</button>' +
+      '</div>';
+    goalsPanel.hidden = false;
+
+    var chipsEl = goalsPanel.querySelector('.goals-chips');
+    var inputEl = goalsPanel.querySelector('.goals-input');
+    var addBtn = goalsPanel.querySelector('.goals-add-btn');
+    var marks = [];
+
+    function render(){
+      chipsEl.innerHTML = marks.map(function(m){
+        return '<span class="goal-chip">' +
+          '<span class="goal-time" data-t="' + m.t + '">⚽ ' + fmtSeconds(m.t) + '</span>' +
+          '<input class="goal-scorer-input" data-t="' + m.t + '" placeholder="是誰？" value="' + escapeHtml(m.scorer) + '">' +
+          '<button type="button" class="goal-x" data-t="' + m.t + '">×</button>' +
+        '</span>';
+      }).join('');
+    }
+
+    function addMark(rawT){
+      var t = Math.max(0, Math.round(rawT));
+      if(marks.some(function(m){ return m.t === t; })) return null;
+      var mark = { t: t, scorer: '' };
+      marks.push(mark);
+      marks.sort(function(a,b){ return a.t - b.t; });
+      render();
+      apiPost('addGoal', { fileId: fileId, t: t, scorer: '' }).catch(function(){});
+      return mark;
+    }
+
+    apiGet('goals').then(function(res){
+      var list = (res.ok && res.goals && res.goals[fileId]) ? res.goals[fileId] : [];
+      marks = list.map(normalizeMark).sort(function(a,b){ return a.t-b.t; });
+      render();
+    }).catch(function(){});
+
+    chipsEl.addEventListener('click', function(e){
+      var xBtn = e.target.closest('.goal-x');
+      if(xBtn){
+        var rm = parseFloat(xBtn.getAttribute('data-t'));
+        marks = marks.filter(function(m){ return m.t !== rm; });
+        render();
+        apiPost('removeGoal', { fileId: fileId, t: rm }).catch(function(){});
+        return;
+      }
+      var timeEl = e.target.closest('.goal-time');
+      if(timeEl){
+        videoEl.currentTime = parseFloat(timeEl.getAttribute('data-t'));
+        videoEl.play().catch(function(){});
+      }
+    });
+
+    chipsEl.addEventListener('change', function(e){
+      if(!e.target.classList.contains('goal-scorer-input')) return;
+      var t = parseFloat(e.target.getAttribute('data-t'));
+      var m = marks.filter(function(mm){ return mm.t === t; })[0];
+      if(m){
+        m.scorer = e.target.value.trim();
+        apiPost('updateGoalScorer', { fileId: fileId, t: t, scorer: m.scorer }).catch(function(){});
+      }
+    });
+
+    chipsEl.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' && e.target.classList.contains('goal-scorer-input')) e.target.blur();
+    });
+
+    function addFromInput(){
+      var t = parseTimeInput(inputEl.value);
+      if(t === null){ inputEl.focus(); return; }
+      addMark(t);
+      inputEl.value = '';
+    }
+
+    addBtn.addEventListener('click', addFromInput);
+    inputEl.addEventListener('keydown', function(e){ if(e.key === 'Enter') addFromInput(); });
+
+    activeGoalsController = {
+      quickMark: function(){
+        var mark = addMark(videoEl.currentTime - QUICK_MARK_BACKTRACK_SECONDS);
+        if(!mark) return;
+        requestAnimationFrame(function(){
+          var input = chipsEl.querySelector('.goal-scorer-input[data-t="' + mark.t + '"]');
+          if(input) input.focus();
+        });
+      }
+    };
+  }
+
   function openPlayer(file){
     if(file.__demo){
       modalVideo.removeAttribute('src');
@@ -507,6 +875,13 @@
     modalSub.textContent = meta.join('・');
     modal.classList.add('open');
     modalVideo.play().catch(function(){});
+
+    rosterPanel.hidden = true;
+    rosterPanel.innerHTML = '';
+    goalsPanel.hidden = true;
+    goalsPanel.innerHTML = '';
+    setupRoster(file.id);
+    setupGoals(file.id, modalVideo);
   }
 
   function closePlayer(){
@@ -514,11 +889,35 @@
     modalVideo.pause();
     modalVideo.removeAttribute('src');
     modalVideo.load();
+    activeGoalsController = null;
+    refreshPlayerTags();
+  }
+
+  // 把球員名單蓋到縮圖上——一次讀整個 players 集合（而不是每張卡片各讀一次），
+  // 球友光看縮圖就能判斷這段有沒有自己在場上。
+  function refreshPlayerTags(){
+    apiGet('players').then(function(res){
+      if(!res.ok) return;
+      var map = res.players || {};
+      contentEl.querySelectorAll('.card').forEach(function(card){
+        var names = map[card.getAttribute('data-fileid')];
+        var tag = card.querySelector('.players-tag');
+        if(tag) tag.textContent = (names && names.length) ? names.join('、') : '';
+      });
+    }).catch(function(){});
   }
 
   document.getElementById('modalClose').addEventListener('click', closePlayer);
   modal.addEventListener('click', function(e){ if(e.target === modal) closePlayer(); });
-  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closePlayer(); });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){ closePlayer(); return; }
+    if(!modal.classList.contains('open') || !activeGoalsController) return;
+    if(e.key.toLowerCase() !== 'g') return;
+    var active = document.activeElement;
+    if(active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) return;
+    e.preventDefault();
+    activeGoalsController.quickMark();
+  });
 
   function renderGroups(files){
     statusEl.classList.add('hidden');
@@ -539,15 +938,27 @@
     });
 
     var latestTime = Math.max.apply(null, files.map(function(f){ return f.__ts; }));
+    var EXPANDED_BY_DEFAULT = 2;
+
+    var jumpsHtml = '';
+    if(order.length > 1){
+      jumpsHtml += '<div class="day-jumps">';
+      order.forEach(function(k, gi){
+        var jdl = dayLabel(groups[k][0].__ts);
+        jumpsHtml += '<button type="button" class="day-jump' + (gi === 0 ? ' is-latest' : '') + '" data-daykey="' + escapeHtml(k) + '">' + jdl.num + '</button>';
+      });
+      jumpsHtml += '</div>';
+    }
 
     var html = '';
     order.forEach(function(k, gi){
       var list = groups[k].slice().sort(function(a, b){ return b.__ts - a.__ts; });
       var dl = dayLabel(list[0].__ts);
       var gameNo = String(order.length - gi).padStart(2, '0');
-      html += '<section class="day-group">';
+      var collapsed = gi >= EXPANDED_BY_DEFAULT;
+      html += '<section class="day-group' + (collapsed ? ' collapsed' : '') + '" id="day-' + escapeHtml(k) + '">';
       html += '<div class="day-overline">Game Day ' + gameNo + '</div>';
-      html += '<div class="day-head"><span class="day-num">' + dl.num + '</span><span class="day-label">' + dl.label + '</span><span class="day-count">' + list.length + ' 支影片</span></div>';
+      html += '<div class="day-head"><span class="day-num">' + dl.num + '</span><span class="day-label">' + dl.label + '</span><span class="day-count">' + list.length + ' 支影片</span><span class="day-toggle">▾</span></div>';
       html += '<div class="card-grid">';
       list.forEach(function(f, i){
         var vmm = f.videoMediaMetadata || {};
@@ -557,26 +968,44 @@
         var isLatest = f.__ts === latestTime;
         var dur = fmtDuration(vmm.durationMillis);
         var thumb = f.thumbnailLink || '';
-        html += '<div class="card" style="width:' + widthPx + 'px" data-idx="' + f.__idx + '">';
+        html += '<div class="card" style="width:' + widthPx + 'px" data-idx="' + f.__idx + '" data-fileid="' + escapeHtml(f.id) + '">';
         if(thumb){
           html += '<img src="' + thumb + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">';
         }
         html += '<div class="scrim"></div>';
         if(isLatest){ html += '<span class="tag">最新</span>'; }
         html += '<div class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>';
-        html += '<div class="info"><span></span><span class="dur">' + dur + '</span></div>';
+        html += '<div class="info"><span class="players-tag"></span><span class="dur">' + dur + '</span></div>';
         html += '</div>';
       });
       html += '</div></section>';
     });
 
-    contentEl.innerHTML = html;
+    contentEl.innerHTML = jumpsHtml + html;
 
     contentEl.querySelectorAll('.card').forEach(function(el){
       el.addEventListener('click', function(){
         openPlayer(files[parseInt(el.getAttribute('data-idx'), 10)]);
       });
     });
+
+    contentEl.querySelectorAll('.day-head').forEach(function(el){
+      el.addEventListener('click', function(){
+        el.closest('.day-group').classList.toggle('collapsed');
+      });
+    });
+
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    contentEl.querySelectorAll('.day-jump').forEach(function(el){
+      el.addEventListener('click', function(){
+        var section = document.getElementById('day-' + el.getAttribute('data-daykey'));
+        if(!section) return;
+        section.classList.remove('collapsed');
+        section.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      });
+    });
+
+    refreshPlayerTags();
   }
 
   // 示範資料：直式先略過，等接上真實資料、系統偵測到直式影片時會自動以正確比例出現
@@ -611,7 +1040,11 @@
       renderGroups(files);
     })
     .catch(function(err){
-      showSetupNote('讀取失敗：' + err.message);
+      // 讀不到即時資料（例如在 Artifact 預覽環境裡無法對外連線）時，
+      // 退回顯示示範版面，而不是整頁空白——球員名單/進球標記功能仍可照常測試。
+      MOCK_FILES.forEach(function(f, i){ f.__idx = i; f.__ts = recordedTime(f); });
+      renderGroups(MOCK_FILES);
+      contentEl.insertAdjacentHTML('afterbegin', '<div class="setup-note" style="margin-bottom:26px"><b>目前顯示示範版面。</b>即時資料讀取失敗（' + escapeHtml(err.message) + '），這通常是預覽環境本身的連線限制，正式網站上不會有這個狀況。</div>');
     });
 })();
 </script>
