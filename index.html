@@ -268,6 +268,43 @@
   .day-jump:hover{ border-color: var(--blue); background: var(--blue-soft); }
   .day-jump.is-latest{ border-color: var(--red); color: var(--red); font-weight: 700; }
 
+  /* ---- filter videos by player, across every game day at once ---- */
+  .player-filters{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+  .player-filters[hidden]{ display: none; }
+  .player-filters-label{
+    font-family: 'Teko', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-right: 2px;
+  }
+  .player-filter-chip{
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 6px 13px;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: #fff;
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+  .player-filter-chip:hover{ border-color: var(--red-dim); color: var(--red); }
+  .player-filter-chip.active{
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff;
+    font-weight: 700;
+  }
+
   /* ---- roster (players for this clip) — lives inside the dark modal ---- */
   #rosterPanel{ color: var(--on-black); }
   #rosterPanel[hidden]{ display: none; }
@@ -615,6 +652,7 @@
 
     .page{ padding: 32px 18px 56px; }
     .day-jump{ font-size: 14px; padding: 8px 15px; }
+    .player-filter-chip{ font-size: 14px; padding: 8px 15px; }
     .day-num{ font-size: 36px; }
     .day-label{ font-size: 16px; }
     .day-count{ font-size: 12.5px; }
@@ -663,6 +701,8 @@
     <span class="spin"></span>
     <span>暖身中・整理本季賽事…</span>
   </div>
+
+  <div id="playerFilters" class="player-filters" hidden></div>
 
   <div id="content"></div>
 
@@ -1001,18 +1041,72 @@
     refreshPlayerTags();
   }
 
+  // 依球員篩選——點一個名字，所有 GAME DAY 同時套用
+  var activePlayerFilter = null;
+  var playerFileIndex = {}; // 球員名字 -> 有他的 fileId 清單
+
+  function renderPlayerFilterBar(){
+    var names = Object.keys(playerFileIndex).sort(function(a, b){ return a.localeCompare(b, 'zh-Hant'); });
+    var bar = document.getElementById('playerFilters');
+    if(!names.length){ bar.hidden = true; return; }
+    bar.innerHTML = '<span class="player-filters-label">依球員篩選</span>' +
+      names.map(function(n){
+        return '<button type="button" class="player-filter-chip' + (activePlayerFilter === n ? ' active' : '') + '" data-name="' + escapeHtml(n) + '">' + escapeHtml(n) + '</button>';
+      }).join('');
+    bar.hidden = false;
+    bar.querySelectorAll('.player-filter-chip').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var name = btn.getAttribute('data-name');
+        activePlayerFilter = (activePlayerFilter === name) ? null : name;
+        applyPlayerFilter();
+        renderPlayerFilterBar();
+      });
+    });
+  }
+
+  function applyPlayerFilter(){
+    var matchSet = activePlayerFilter ? (playerFileIndex[activePlayerFilter] || []) : null;
+    contentEl.querySelectorAll('.day-group').forEach(function(section){
+      var total = 0, visible = 0;
+      section.querySelectorAll('.card').forEach(function(card){
+        total++;
+        var fid = card.getAttribute('data-fileid');
+        var show = !matchSet || matchSet.indexOf(fid) !== -1;
+        card.style.display = show ? '' : 'none';
+        if(show) visible++;
+      });
+      var countEl = section.querySelector('.day-count');
+      if(countEl) countEl.textContent = matchSet ? (visible + ' / ' + total + ' 支影片') : (total + ' 支影片');
+      section.hidden = !!(matchSet && visible === 0);
+      if(matchSet && visible > 0) section.classList.remove('collapsed');
+    });
+  }
+
   // 把球員名單蓋到縮圖上——一次讀整個 players 集合（而不是每張卡片各讀一次），
-  // 球友光看縮圖就能判斷這段有沒有自己在場上。
+  // 球友光看縮圖就能判斷這段有沒有自己在場上；同時建立篩選用的球員索引。
   function refreshPlayerTags(){
     apiGet('players').then(function(res){
       if(!res.ok) return;
       var map = res.players || {};
+      var fileNames = {};
+      var nameToFiles = {};
+      Object.keys(map).forEach(function(fileId){
+        var entry = map[fileId] || {};
+        var names = [].concat(entry.red || [], entry.blue || []);
+        fileNames[fileId] = names;
+        names.forEach(function(n){
+          if(!nameToFiles[n]) nameToFiles[n] = [];
+          if(nameToFiles[n].indexOf(fileId) === -1) nameToFiles[n].push(fileId);
+        });
+      });
       contentEl.querySelectorAll('.card').forEach(function(card){
-        var entry = map[card.getAttribute('data-fileid')];
-        var names = entry ? [].concat(entry.red || [], entry.blue || []) : [];
+        var names = fileNames[card.getAttribute('data-fileid')] || [];
         var tag = card.querySelector('.players-tag');
         if(tag) tag.textContent = names.length ? names.join('、') : '';
       });
+      playerFileIndex = nameToFiles;
+      renderPlayerFilterBar();
+      applyPlayerFilter();
     }).catch(function(){});
   }
 
