@@ -100,7 +100,7 @@
   .wordmark .dot{ color: var(--red); }
   .navbar .season{
     font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
+    font-size: 16px;
     letter-spacing: 0.05em;
     color: var(--on-black-dim);
   }
@@ -142,7 +142,7 @@
     font-family: 'Teko', sans-serif;
     font-weight: 500;
     font-style: italic;
-    font-size: 18px;
+    font-size: 24px;
     letter-spacing: 0.04em;
     color: var(--blue);
     margin: 0 0 22px;
@@ -151,7 +151,7 @@
   }
 
   .lede{
-    font-size: 15.5px;
+    font-size: 16px;
     line-height: 1.8;
     color: var(--on-black-dim);
     max-width: 58ch;
@@ -176,7 +176,7 @@
     border: 1px solid var(--line);
     border-radius: 10px;
     color: var(--text-dim);
-    font-size: 14px;
+    font-size: 16px;
     box-shadow: 0 1px 2px rgba(10,12,16,0.04);
   }
   #status.hidden{ display:none; }
@@ -196,7 +196,7 @@
     border: 1px dashed var(--line-strong);
     border-radius: 12px;
     color: var(--text-dim);
-    font-size: 13.5px;
+    font-size: 16px;
     line-height: 1.9;
   }
   .setup-note b{ color: var(--text); }
@@ -207,7 +207,7 @@
   .day-overline{
     font-family: 'Teko', sans-serif;
     font-weight: 600;
-    font-size: 12px;
+    font-size: 16px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--red);
@@ -231,15 +231,15 @@
     color: var(--text);
     line-height: 1;
   }
-  .day-label{ font-weight: 700; font-size: 14.5px; color: var(--text-dim); }
+  .day-label{ font-weight: 700; font-size: 16px; color: var(--text-dim); }
   .day-count{
     margin-left: auto;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
+    font-size: 16px;
     color: var(--text-faint);
   }
   .day-toggle{
-    font-size: 11px;
+    font-size: 16px;
     color: var(--text-faint);
     transition: transform 0.15s;
     flex-shrink: 0;
@@ -256,13 +256,13 @@
   }
   .day-jump{
     font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
+    font-size: 16px;
     font-weight: 500;
     padding: 6px 13px;
     border-radius: 999px;
     border: 1px solid rgba(26,79,180,0.32);
     background: #fff;
-    color: var(--blue-dim);
+    color: var(--blue);
     cursor: pointer;
   }
   .day-jump:hover{ border-color: var(--blue); background: var(--blue-soft); }
@@ -280,7 +280,7 @@
   .player-filters-label{
     font-family: 'Teko', sans-serif;
     font-weight: 600;
-    font-size: 12px;
+    font-size: 16px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--text-faint);
@@ -288,7 +288,7 @@
   }
   .player-filter-chip{
     font-family: 'Noto Sans TC', sans-serif;
-    font-size: 12.5px;
+    font-size: 16px;
     font-weight: 500;
     padding: 6px 13px;
     border-radius: 999px;
@@ -317,21 +317,21 @@
   }
   .roster-team:last-child{ margin-bottom: 0; }
   .team-label{
-    font-family: 'Teko', sans-serif;
-    font-weight: 600;
-    font-size: 13px;
-    letter-spacing: 0.08em;
-    width: 38px;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.02em;
+    width: 46px;
     flex-shrink: 0;
   }
   .team-label-red{ color: #ff8e92; }
-  .team-label-blue{ color: #8fb4f0; }
+  .team-label-blue{ color: var(--blue); }
   .roster-chips{ display: contents; }
   .roster-chip{
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 12.5px;
+    font-size: 16px;
     font-weight: 500;
     padding: 4px 6px 4px 11px;
     border-radius: 999px;
@@ -352,22 +352,22 @@
     background: transparent;
     color: inherit;
     cursor: pointer;
-    width: 15px; height: 15px;
+    width: 22px; height: 22px;
     border-radius: 50%;
-    font-size: 11px;
+    font-size: 16px;
     line-height: 1;
     display: flex; align-items: center; justify-content: center;
     padding: 0;
   }
   .roster-x:hover{ background: rgba(0,0,0,0.35); }
   .roster-input{
-    width: 132px;
+    width: 180px;
     border: 1px solid var(--on-black-line);
     background: var(--black-2);
     color: var(--on-black);
     border-radius: 6px;
     padding: 6px 10px;
-    font-size: 12.5px;
+    font-size: 16px;
     font-family: 'Noto Sans TC', sans-serif;
   }
   .roster-input-red:focus{ outline: none; border-color: var(--red); }
@@ -430,7 +430,7 @@
     top: 8px; left: 8px;
     font-family: 'Teko', sans-serif;
     font-weight: 600;
-    font-size: 12px;
+    font-size: 16px;
     letter-spacing: 0.06em;
     color: #fff;
     background: var(--red);
@@ -443,7 +443,7 @@
     position: absolute;
     left: 10px; right: 10px; bottom: 8px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
+    font-size: 16px;
     color: #fff;
     display: flex;
     justify-content: space-between;
@@ -453,7 +453,7 @@
   .card .info .players-tag{
     font-family: 'Noto Sans TC', sans-serif;
     font-weight: 700;
-    font-size: 11.5px;
+    font-size: 16px;
     color: #fff;
     text-shadow: 0 1px 3px rgba(0,0,0,0.6);
     flex: 1 1 auto;
@@ -492,10 +492,10 @@
     gap: 16px;
     color: var(--on-black);
   }
-  .modal-title{ font-weight: 700; font-size: 15px; }
+  .modal-title{ font-weight: 700; font-size: 16px; }
   .modal-sub{
     font-family: 'JetBrains Mono', monospace;
-    font-size: 11.5px;
+    font-size: 16px;
     color: var(--on-black-dim);
     margin-top: 2px;
   }
@@ -535,7 +535,7 @@
   .goals-label{
     font-family: 'Teko', sans-serif;
     font-weight: 600;
-    font-size: 12px;
+    font-size: 16px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--on-black);
@@ -549,7 +549,7 @@
     background: var(--red-soft);
     color: #ffd9db;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
+    font-size: 16px;
     font-weight: 500;
     padding: 4px 4px 4px 11px;
     border-radius: 999px;
@@ -564,7 +564,7 @@
     background: transparent;
     color: #fff;
     font-family: 'Noto Sans TC', sans-serif;
-    font-size: 11.5px;
+    font-size: 16px;
     font-weight: 500;
     padding: 0 4px 0 8px;
     margin-left: 4px;
@@ -576,9 +576,9 @@
     background: transparent;
     color: inherit;
     cursor: pointer;
-    width: 15px; height: 15px;
+    width: 22px; height: 22px;
     border-radius: 50%;
-    font-size: 11px;
+    font-size: 16px;
     line-height: 1;
     display: flex; align-items: center; justify-content: center;
     padding: 0;
@@ -586,14 +586,14 @@
   .goal-x:hover{ background: rgba(0,0,0,0.35); }
   .goals-add{ display: flex; flex-wrap: wrap; gap: 8px; }
   .goals-input{
-    width: 84px;
+    width: 96px;
     border: 1px solid var(--on-black-line);
     background: var(--black-2);
     color: var(--on-black);
     border-radius: 6px;
     padding: 6px 10px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 12.5px;
+    font-size: 16px;
   }
   .goals-input:focus{ outline: none; border-color: var(--red); }
   .goals-add-btn{
@@ -602,7 +602,7 @@
     color: var(--red);
     border-radius: 6px;
     padding: 6px 14px;
-    font-size: 12.5px;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     font-family: 'Noto Sans TC', sans-serif;
@@ -615,7 +615,7 @@
     border-radius: 6px;
     padding: 6px 12px;
     font-family: 'Noto Sans TC', sans-serif;
-    font-size: 12.5px;
+    font-size: 16px;
     font-weight: 700;
     cursor: pointer;
     flex-shrink: 0;
@@ -624,7 +624,7 @@
   .quickmark-btn:hover{ box-shadow: 0 4px 14px -4px rgba(26,79,180,0.8); }
   .quickmark-btn:active{ transform: scale(0.96); }
   .goals-hint{
-    font-size: 11px;
+    font-size: 16px;
     color: var(--on-black-dim);
     margin: -2px 0 10px;
   }
@@ -638,43 +638,43 @@
     margin-top: 32px;
     padding-top: 20px;
     border-top: 1px solid var(--line-strong);
-    font-size: 12.5px;
+    font-size: 16px;
     color: var(--text-faint);
   }
   .meta-row a{ color: var(--red); text-decoration: none; border-bottom: 1px solid var(--red-dim); }
   .meta-row a:hover{ color: var(--red-dim); }
 
   @media (max-width: 560px){
-    .navbar .season{ font-size: 12px; }
+    .navbar .season{ font-size: 16px; }
     .hero-body{ padding: 44px 18px 48px; }
     .eyebrow{ font-size: 17px; }
     .lede{ font-size: 16.5px; line-height: 1.85; }
 
     .page{ padding: 32px 18px 56px; }
-    .day-jump{ font-size: 14px; padding: 8px 15px; }
-    .player-filter-chip{ font-size: 14px; padding: 8px 15px; }
+    .day-jump{ font-size: 16px; padding: 8px 15px; }
+    .player-filter-chip{ font-size: 16px; padding: 8px 15px; }
     .day-num{ font-size: 36px; }
     .day-label{ font-size: 16px; }
-    .day-count{ font-size: 12.5px; }
-    .day-toggle{ font-size: 12px; }
+    .day-count{ font-size: 16px; }
+    .day-toggle{ font-size: 16px; }
 
     .card-grid{ flex-direction: column; gap: 16px; }
     .card{ width: 100% !important; height: auto; }
-    .card .info{ font-size: 13px; }
-    .card .players-tag{ font-size: 13.5px; }
-    .card .tag{ font-size: 13px; }
+    .card .info{ font-size: 16px; }
+    .card .players-tag{ font-size: 16px; }
+    .card .tag{ font-size: 16px; }
 
-    .meta-row{ font-size: 13.5px; }
+    .meta-row{ font-size: 16px; }
 
     .modal{ padding: 14px; }
     .modal-title{ font-size: 16px; }
-    .modal-sub{ font-size: 12.5px; }
-    .modal-panel-label{ font-size: 13px; }
-    .goals-hint{ font-size: 12.5px; }
-    .roster-chip, .goal-chip{ font-size: 14px; }
-    .roster-input, .goals-input, .goal-scorer-input{ font-size: 14px; }
-    .quickmark-btn, .goals-add-btn{ font-size: 14px; padding: 9px 14px; }
-    .roster-x, .goal-x{ width: 18px; height: 18px; font-size: 12px; }
+    .modal-sub{ font-size: 16px; }
+    .modal-panel-label{ font-size: 16px; }
+    .goals-hint{ font-size: 16px; }
+    .roster-chip, .goal-chip{ font-size: 16px; }
+    .roster-input, .goals-input, .goal-scorer-input{ font-size: 16px; }
+    .quickmark-btn, .goals-add-btn{ font-size: 16px; padding: 9px 14px; }
+    .roster-x, .goal-x{ width: 24px; height: 24px; font-size: 16px; }
   }
 </style>
 </head>
@@ -691,7 +691,7 @@
     <h1>河濱NBA<span class="accent-char">季後賽</span></h1>
     <p class="tagline">“ Somewhere Only We Know ”</p>
     <p class="lede">
-      由駐場記者上傳到<a href="https://drive.google.com/drive/folders/12qlNZh5gT0dlB01MbUw-SUczqfC0ycKQ" target="_blank" rel="noopener">轉播庫</a>裡的每一支影片，依比賽日自動整理在以下頻道清單——馬上開啟最新戰況，點縮圖直接進場觀賽。
+      依比賽日自動更新在以下——馬上開啟最新戰況，點縮圖直接進場觀賽！
     </p>
   </div>
 </div>
@@ -737,7 +737,7 @@
   // ---- 設定：資料夾、API Key、球員/進球資料後端（Google Apps Script） ----
   var FOLDER_ID = '12qlNZh5gT0dlB01MbUw-SUczqfC0ycKQ';
   var API_KEY = 'AIzaSyB-hXDy6Nekjga9l8qMMHCVhgoZbQOQASE';
-  var SHEETS_API = 'https://script.google.com/macros/s/AKfycbw6W5qS0yr4TiT-zR9iHkzv8UfDuN_Qu2tUR1duSwk0I5ZCcVkbC3oypqniPua2t2EE/exec';
+  var SHEETS_API = 'https://script.google.com/macros/s/AKfycbzcq88M41u3nMau1pBoA-Y8PVFSDw4iRolDd4v9FN6T2VKuQDMbApLa69blx6KQtMg2/exec';
 
   function apiGet(action){
     return fetch(SHEETS_API + '?action=' + action).then(function(r){ return r.json(); });
@@ -858,7 +858,9 @@
       if(e.key !== 'Enter') return;
       var v = inputEl.value.trim();
       if(!v) return;
-      if(names.indexOf(v) === -1){
+      var vLower = v.toLowerCase();
+      var exists = names.some(function(n){ return n.toLowerCase() === vLower; });
+      if(!exists){
         names.push(v);
         render();
         apiPost('addPlayer', { fileId: fileId, team: team.key, name: v }).catch(function(){});
@@ -1041,23 +1043,27 @@
     refreshPlayerTags();
   }
 
-  // 依球員篩選——點一個名字，所有 GAME DAY 同時套用
+  // 依球員篩選——點一個名字，所有 GAME DAY 同時套用。
+  // 索引用小寫當 key（不分大小寫比對/分組），顯示用「最早出現的那個寫法」。
   var activePlayerFilter = null;
-  var playerFileIndex = {}; // 球員名字 -> 有他的 fileId 清單
+  var playerFileIndex = {}; // 小寫 key -> { display: 原始寫法, files: [fileId...] }
 
   function renderPlayerFilterBar(){
-    var names = Object.keys(playerFileIndex).sort(function(a, b){ return a.localeCompare(b, 'zh-Hant'); });
+    var keys = Object.keys(playerFileIndex).sort(function(a, b){
+      return playerFileIndex[a].display.localeCompare(playerFileIndex[b].display, 'zh-Hant');
+    });
     var bar = document.getElementById('playerFilters');
-    if(!names.length){ bar.hidden = true; return; }
+    if(!keys.length){ bar.hidden = true; return; }
     bar.innerHTML = '<span class="player-filters-label">依球員篩選</span>' +
-      names.map(function(n){
-        return '<button type="button" class="player-filter-chip' + (activePlayerFilter === n ? ' active' : '') + '" data-name="' + escapeHtml(n) + '">' + escapeHtml(n) + '</button>';
+      keys.map(function(k){
+        var display = playerFileIndex[k].display;
+        return '<button type="button" class="player-filter-chip' + (activePlayerFilter === k ? ' active' : '') + '" data-key="' + escapeHtml(k) + '">' + escapeHtml(display) + '</button>';
       }).join('');
     bar.hidden = false;
     bar.querySelectorAll('.player-filter-chip').forEach(function(btn){
       btn.addEventListener('click', function(){
-        var name = btn.getAttribute('data-name');
-        activePlayerFilter = (activePlayerFilter === name) ? null : name;
+        var key = btn.getAttribute('data-key');
+        activePlayerFilter = (activePlayerFilter === key) ? null : key;
         applyPlayerFilter();
         renderPlayerFilterBar();
       });
@@ -1065,7 +1071,8 @@
   }
 
   function applyPlayerFilter(){
-    var matchSet = activePlayerFilter ? (playerFileIndex[activePlayerFilter] || []) : null;
+    var entry = activePlayerFilter ? playerFileIndex[activePlayerFilter] : null;
+    var matchSet = entry ? entry.files : null;
     contentEl.querySelectorAll('.day-group').forEach(function(section){
       var total = 0, visible = 0;
       section.querySelectorAll('.card').forEach(function(card){
@@ -1095,8 +1102,9 @@
         var names = [].concat(entry.red || [], entry.blue || []);
         fileNames[fileId] = names;
         names.forEach(function(n){
-          if(!nameToFiles[n]) nameToFiles[n] = [];
-          if(nameToFiles[n].indexOf(fileId) === -1) nameToFiles[n].push(fileId);
+          var key = n.toLowerCase();
+          if(!nameToFiles[key]) nameToFiles[key] = { display: n, files: [] };
+          if(nameToFiles[key].files.indexOf(fileId) === -1) nameToFiles[key].files.push(fileId);
         });
       });
       contentEl.querySelectorAll('.card').forEach(function(card){
