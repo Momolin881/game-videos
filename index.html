@@ -326,6 +326,21 @@
   }
   .team-label-red{ color: #ff8e92; }
   .team-label-blue{ color: var(--blue); }
+  .win-check{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .win-checkbox{
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .win-checkbox[data-team="red"]{ accent-color: var(--red); }
+  .win-checkbox[data-team="blue"]{ accent-color: var(--blue); }
   .roster-chips{ display: contents; }
   .roster-chip{
     display: inline-flex;
@@ -518,14 +533,18 @@
     overflow: hidden;
     border: 1px solid var(--on-black-line);
     box-shadow: 0 30px 70px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(226,32,44,0.15), 0 0 90px -30px rgba(26,79,180,0.3);
-    max-height: 42vh;
-    display: flex;
-    justify-content: center;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 100%;
+    max-height: 48vh;
+    aspect-ratio: 16 / 9;
+    flex-shrink: 0;
   }
   .modal-video-wrap video{
-    max-width: 100%;
-    max-height: 42vh;
     display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
 
   /* ---- goal timeline (inside modal) ---- */
@@ -554,6 +573,11 @@
     padding: 4px 4px 4px 11px;
     border-radius: 999px;
     border: 1px solid rgba(226,32,44,0.4);
+  }
+  .goal-chip-blue{
+    background: rgba(26,79,180,0.35);
+    color: #cfe0ff;
+    border: 1px solid rgba(26,79,180,0.55);
   }
   .goal-time{ cursor: pointer; white-space: nowrap; }
   .goal-time:hover{ text-decoration: underline; }
@@ -666,15 +690,17 @@
 
     .meta-row{ font-size: 16px; }
 
-    .modal{ padding: 14px; }
+    .modal{ padding: 6px; }
+    .modal-video-wrap{ max-height: 62vh; }
     .modal-title{ font-size: 16px; }
     .modal-sub{ font-size: 16px; }
     .modal-panel-label{ font-size: 16px; }
     .goals-hint{ font-size: 16px; }
-    .roster-chip, .goal-chip{ font-size: 16px; }
-    .roster-input, .goals-input, .goal-scorer-input{ font-size: 16px; }
+    .roster-chip, .goal-chip{ font-size: 10px; padding: 3px 5px 3px 9px; gap: 4px; }
+    .roster-input, .goals-input{ font-size: 16px; }
+    .goal-scorer-input{ font-size: 10px; width: 46px; }
     .quickmark-btn, .goals-add-btn{ font-size: 16px; padding: 9px 14px; }
-    .roster-x, .goal-x{ width: 24px; height: 24px; font-size: 16px; }
+    .roster-x, .goal-x{ width: 15px; height: 15px; font-size: 10px; }
   }
 </style>
 </head>
@@ -724,7 +750,7 @@
       </div>
       <button class="modal-close" id="modalClose" aria-label="關閉">✕</button>
     </div>
-    <div class="modal-video-wrap">
+    <div class="modal-video-wrap" id="modalVideoWrap">
       <video id="modalVideo" controls playsinline></video>
     </div>
     <div id="rosterPanel" hidden></div>
@@ -737,7 +763,7 @@
   // ---- 設定：資料夾、API Key、球員/進球資料後端（Google Apps Script） ----
   var FOLDER_ID = '12qlNZh5gT0dlB01MbUw-SUczqfC0ycKQ';
   var API_KEY = 'AIzaSyB-hXDy6Nekjga9l8qMMHCVhgoZbQOQASE';
-  var SHEETS_API = 'https://script.google.com/macros/s/AKfycbzcq88M41u3nMau1pBoA-Y8PVFSDw4iRolDd4v9FN6T2VKuQDMbApLa69blx6KQtMg2/exec';
+  var SHEETS_API = 'https://script.google.com/macros/s/AKfycbyadNTqMsUk8R3zp9G2tLMUSH8Vl5DF5Njs7CU7CO7pGwzjUS9Z1C0giHlxwtMNxpG9/exec';
 
   function apiGet(action){
     return fetch(SHEETS_API + '?action=' + action).then(function(r){ return r.json(); });
@@ -751,10 +777,23 @@
     }).then(function(r){ return r.json(); });
   }
 
+  // 球員名單跟影片清單是兩個不相干的請求，一進頁面就同時發出去（不等影片清單讀完才開始），
+  // 這樣「依球員篩選」那排標籤才不會在畫面上明顯慢一拍才出現。
+  var earlyPlayersPromise = apiGet('players').catch(function(){ return null; });
+  var usedEarlyPlayers = false;
+  function getPlayersData(){
+    if(!usedEarlyPlayers){
+      usedEarlyPlayers = true;
+      return earlyPlayersPromise;
+    }
+    return apiGet('players').catch(function(){ return null; });
+  }
+
   var statusEl = document.getElementById('status');
   var contentEl = document.getElementById('content');
   var modal = document.getElementById('modal');
   var modalVideo = document.getElementById('modalVideo');
+  var modalVideoWrap = document.getElementById('modalVideoWrap');
   var modalTitle = document.getElementById('modalTitle');
   var modalSub = document.getElementById('modalSub');
   var rosterPanel = document.getElementById('rosterPanel');
@@ -874,7 +913,7 @@
       '<div class="modal-panel-label">本場參與球員</div>' +
       TEAMS.map(function(team){
         return '<div class="roster-team" data-team="' + team.key + '">' +
-          '<span class="team-label team-label-' + team.key + '">' + team.label + '</span>' +
+          '<label class="win-check"><input type="checkbox" class="win-checkbox" data-team="' + team.key + '"><span class="team-label team-label-' + team.key + '">' + team.label + '</span><span class="win-medal" hidden>🏅</span></label>' +
           '<span class="roster-chips"></span>' +
           '<input class="roster-input roster-input-' + team.key + '" placeholder="+ 新增，按 Enter">' +
         '</div>';
@@ -888,6 +927,40 @@
       });
     }).catch(function(){
       TEAMS.forEach(function(team){ setupRosterTeam(fileId, team, []); });
+    });
+
+    setupWinnerCheckboxes(fileId);
+  }
+
+  // 標記這支影片哪隊贏——紅藍互斥，勾一個另一個自動取消
+  function setupWinnerCheckboxes(fileId){
+    var boxes = rosterPanel.querySelectorAll('.win-checkbox');
+
+    function syncMedal(box){
+      var medal = box.parentElement.querySelector('.win-medal');
+      if(medal) medal.hidden = !box.checked;
+    }
+
+    apiGet('results').then(function(res){
+      var winner = (res.ok && res.results) ? res.results[fileId] : null;
+      boxes.forEach(function(box){
+        box.checked = (box.getAttribute('data-team') === winner);
+        syncMedal(box);
+      });
+    }).catch(function(){});
+
+    boxes.forEach(function(box){
+      box.addEventListener('change', function(){
+        var team = box.getAttribute('data-team');
+        if(box.checked){
+          boxes.forEach(function(b){ if(b !== box){ b.checked = false; syncMedal(b); } });
+          syncMedal(box);
+          apiPost('setWinner', { fileId: fileId, winner: team }).catch(function(){});
+        } else {
+          syncMedal(box);
+          apiPost('setWinner', { fileId: fileId, winner: '' }).catch(function(){});
+        }
+      });
     });
   }
 
@@ -917,10 +990,20 @@
     var addBtn = goalsPanel.querySelector('.goals-add-btn');
     var quickBtn = goalsPanel.querySelector('.quickmark-btn');
     var marks = [];
+    var scorerTeam = {}; // 球員名字（小寫）-> 'red' | 'blue'，用來幫進球標籤對應隊伍顏色
+
+    apiGet('players').then(function(res){
+      var data = (res.ok && res.players && res.players[fileId]) || {};
+      (data.red || []).forEach(function(n){ scorerTeam[n.toLowerCase()] = 'red'; });
+      (data.blue || []).forEach(function(n){ scorerTeam[n.toLowerCase()] = 'blue'; });
+      render();
+    }).catch(function(){});
 
     function render(){
       chipsEl.innerHTML = marks.map(function(m){
-        return '<span class="goal-chip">' +
+        var team = m.scorer ? scorerTeam[m.scorer.toLowerCase()] : null;
+        var chipClass = 'goal-chip' + (team === 'blue' ? ' goal-chip-blue' : '');
+        return '<span class="' + chipClass + '">' +
           '<span class="goal-time" data-t="' + m.t + '">⚽ ' + fmtSeconds(m.t) + '</span>' +
           '<input class="goal-scorer-input" data-t="' + m.t + '" placeholder="是誰？" value="' + escapeHtml(m.scorer) + '">' +
           '<button type="button" class="goal-x" data-t="' + m.t + '">×</button>' +
@@ -972,6 +1055,7 @@
       if(m){
         m.scorer = e.target.value.trim();
         apiPost('updateGoalScorer', { fileId: fileId, t: t, scorer: m.scorer }).catch(function(){});
+        render();
       }
     });
 
@@ -998,12 +1082,11 @@
   }
 
   function openPlayer(file){
-    // 先用已知的影片尺寸把播放框的比例撐好，避免瀏覽器在真正讀到串流前
-    // 用預設的小尺寸（約 300×150）顯示，造成畫面被壓扁、兩側留大片黑邊。
+    // 比例設在外層框上、影片直接填滿整個框（width/height:100% 寫在 CSS 裡，固定不變）。
+    // 這樣不管橫式直式，瀏覽器都是用同一套「在 max-width/max-height 範圍內維持比例」
+    // 的標準演算法去算框的大小，手機版 Safari 也不會把影片高度算成 0。
     var vmmInit = file.videoMediaMetadata || {};
-    modalVideo.style.aspectRatio = (vmmInit.width || 16) + ' / ' + (vmmInit.height || 9);
-    modalVideo.style.width = (vmmInit.height > vmmInit.width ? 'auto' : '100%');
-    modalVideo.style.height = (vmmInit.height > vmmInit.width ? '100%' : 'auto');
+    modalVideoWrap.style.aspectRatio = (vmmInit.width || 16) + ' / ' + (vmmInit.height || 9);
 
     if(file.__demo){
       modalVideo.removeAttribute('src');
@@ -1092,8 +1175,8 @@
   // 把球員名單蓋到縮圖上——一次讀整個 players 集合（而不是每張卡片各讀一次），
   // 球友光看縮圖就能判斷這段有沒有自己在場上；同時建立篩選用的球員索引。
   function refreshPlayerTags(){
-    apiGet('players').then(function(res){
-      if(!res.ok) return;
+    getPlayersData().then(function(res){
+      if(!res || !res.ok) return;
       var map = res.players || {};
       var fileNames = {};
       var nameToFiles = {};
