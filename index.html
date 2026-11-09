@@ -655,16 +655,24 @@
   .goals-hint b{ color: #ffb3b8; }
 
   .meta-row{
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px 16px;
     margin-top: 32px;
     padding-top: 20px;
     border-top: 1px solid var(--line-strong);
-    font-size: 16px;
     color: var(--text-faint);
   }
+  .meta-label{
+    font-size: 16px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin: 0 0 10px;
+  }
+  .meta-text{
+    font-size: 16px;
+    line-height: 1.7;
+    margin: 0 0 6px;
+  }
+  .meta-text:last-child{ margin-bottom: 0; }
   .meta-row a{ color: var(--red); text-decoration: none; border-bottom: 1px solid var(--red-dim); }
   .meta-row a:hover{ color: var(--red-dim); }
 
@@ -688,7 +696,6 @@
     .card .players-tag{ font-size: 16px; }
     .card .tag{ font-size: 16px; }
 
-    .meta-row{ font-size: 16px; }
 
     .modal{ padding: 6px; }
     .modal-video-wrap{ max-height: 62vh; }
@@ -733,11 +740,9 @@
   <div id="content"></div>
 
   <div class="meta-row">
-    <span>FULL COURT ARCHIVE・點縮圖進場</span>
-    <span>·</span>
-    <span>手機也能看</span>
-    <span>·</span>
-    <a href="https://drive.google.com/drive/folders/12qlNZh5gT0dlB01MbUw-SUczqfC0ycKQ" target="_blank" rel="noopener">在雲端硬碟開啟原始資料夾 ↗</a>
+    <div class="meta-label">・FULL COURT ARCHIVE・</div>
+    <p class="meta-text">點縮圖進場，手機也能看，「建議」最佳觀賞在電腦螢幕。</p>
+    <p class="meta-text">頁面採即時讀取雲端檔案，偶爾卡頓請稍後或隔天再試。</p>
   </div>
 </div>
 
@@ -1326,6 +1331,34 @@
   var q = encodeURIComponent("'" + FOLDER_ID + "' in parents and mimeType contains 'video/' and trashed = false");
   var url = 'https://www.googleapis.com/drive/v3/files?q=' + q + '&fields=' + encodeURIComponent(fields) + '&orderBy=createdTime desc&pageSize=200&key=' + API_KEY;
 
+  // 短時間快取：同一個人短時間內重整頁面，不用每次都重新打 Drive API，
+  // 降低整體用量基準線（不是為了修任何問題，純粹減少不必要的重複請求）。
+  var FILE_LIST_CACHE_KEY = 'gv_file_list_cache_v1';
+  var FILE_LIST_CACHE_TTL_MS = 3 * 60 * 1000; // 3 分鐘內的重整會直接用快取
+
+  function readFileListCache(){
+    try{
+      var raw = sessionStorage.getItem(FILE_LIST_CACHE_KEY);
+      if(!raw) return null;
+      var obj = JSON.parse(raw);
+      if(!obj || !obj.ts || !obj.files) return null;
+      if(Date.now() - obj.ts > FILE_LIST_CACHE_TTL_MS) return null;
+      return obj.files;
+    }catch(e){ return null; }
+  }
+  function writeFileListCache(files){
+    try{
+      sessionStorage.setItem(FILE_LIST_CACHE_KEY, JSON.stringify({ ts: Date.now(), files: files }));
+    }catch(e){ /* 私密瀏覽模式等情況可能擋寫入，略過即可 */ }
+  }
+
+  var cachedFiles = readFileListCache();
+  if(cachedFiles){
+    cachedFiles.forEach(function(f, i){ f.__idx = i; f.__ts = recordedTime(f); });
+    renderGroups(cachedFiles);
+    return;
+  }
+
   fetch(url)
     .then(function(r){
       if(!r.ok) return r.json().then(function(j){ throw new Error((j.error && j.error.message) || ('HTTP ' + r.status)); });
@@ -1333,6 +1366,7 @@
     })
     .then(function(data){
       var files = data.files || [];
+      writeFileListCache(files);
       files.forEach(function(f, i){ f.__idx = i; f.__ts = recordedTime(f); });
       renderGroups(files);
     })
