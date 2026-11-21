@@ -736,7 +736,7 @@
   .era-eyebrow::before{ content:""; width:26px; height:2px; background: var(--blue-dim); }
   .era-title{ font-weight: 900; font-size: clamp(24px, 4vw, 32px); margin: 0 0 8px; color: var(--text); }
   .era-title .accent-char{ color: var(--red); }
-  .era-sub{ font-size: 13.5px; line-height: 1.75; color: var(--text-dim); margin: 0; max-width: 56ch; }
+  .era-sub{ font-size: 16px; line-height: 1.75; color: var(--text-dim); margin: 0; max-width: 56ch; }
   .era-hint{
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
@@ -752,20 +752,20 @@
     padding: 28px;
     max-width: 380px;
   }
-  .era-lock p{ margin: 0 0 14px; font-size: 13.5px; color: var(--text-dim); }
+  .era-lock p{ margin: 0 0 14px; font-size: 16px; color: var(--text-dim); }
   .era-lock input{
     width: 100%;
     padding: 10px 12px;
     border-radius: 8px;
     border: 1px solid var(--line-strong);
-    font-size: 14px;
+    font-size: 16px;
     margin-bottom: 10px;
     box-sizing: border-box;
   }
   .era-lock button, .era-edit-pass button, .era-save-bar button, .era-album-head button{
     font-family: 'Noto Sans TC', sans-serif;
     font-weight: 700;
-    font-size: 13px;
+    font-size: 16px;
     padding: 9px 16px;
     border-radius: 8px;
     border: 1px solid var(--line-strong);
@@ -774,7 +774,7 @@
     cursor: pointer;
   }
   .era-lock button:hover, .era-edit-pass button:hover, .era-save-bar button:hover, .era-album-head button:hover{ background: var(--blue-dim); }
-  .era-lock-msg{ margin-top: 10px; font-size: 12.5px; color: var(--red); min-height: 1.4em; }
+  .era-lock-msg{ margin-top: 10px; font-size: 16px; color: var(--red); min-height: 1.4em; }
 
   .era-row{
     display: flex;
@@ -820,8 +820,8 @@
   }
   .era-card .era-card-info{ position: absolute; left: 14px; right: 14px; bottom: 12px; color: #fff; }
   .era-card .era-card-title{ font-weight: 700; font-size: 16px; margin-bottom: 4px; }
-  .era-card .era-card-desc{ font-size: 11.5px; line-height: 1.5; color: rgba(255,255,255,0.84); margin-bottom: 6px; }
-  .era-card .era-card-count{ font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.78); }
+  .era-card .era-card-desc{ font-size: 16px; line-height: 1.5; color: rgba(255,255,255,0.84); margin-bottom: 6px; }
+  .era-card .era-card-count{ font-family: 'JetBrains Mono', monospace; font-size: 16px; color: rgba(255,255,255,0.78); }
   .era-card .era-card-tag{
     position: absolute; top: 10px; right: 10px;
     font-size: 10.5px;
@@ -857,7 +857,7 @@
     flex-wrap: wrap;
     margin-bottom: 16px;
   }
-  .era-album-head .era-album-title{ font-weight: 700; font-size: 15px; color: var(--text); }
+  .era-album-head .era-album-title{ font-weight: 700; font-size: 16px; color: var(--text); }
   .era-album-head-btns{ display: flex; gap: 8px; }
 
   .era-grid{
@@ -901,9 +901,9 @@
     padding: 8px 10px;
     border-radius: 8px;
     border: 1px solid var(--line-strong);
-    font-size: 13px;
+    font-size: 16px;
   }
-  .era-edit-msg{ font-size: 12px; color: var(--red); }
+  .era-edit-msg{ font-size: 16px; color: var(--red); }
 
   .era-save-bar{ margin-top: 16px; display: flex; justify-content: flex-end; }
 
@@ -936,6 +936,27 @@
     .era-page{ padding: 8px 18px 56px; }
     .era-card{ flex: 0 0 190px; height: 240px; }
   }
+
+  .site-footer{
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 36px 18px 48px;
+    text-align: center;
+    border-top: 1px solid var(--line);
+  }
+  .site-footer p{ font-size: 16px; color: var(--text-dim); margin: 0 0 14px; }
+  .footer-contribute-btn{
+    display: inline-block;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+    background: var(--blue);
+    padding: 10px 22px;
+    border-radius: 999px;
+    text-decoration: none;
+  }
+  .footer-contribute-btn:hover{ background: var(--blue-dim, var(--blue)); opacity: 0.9; }
 </style>
 </head>
 <body>
@@ -1040,6 +1061,11 @@
     <img id="eraModalImg" src="" alt="">
   </div>
 </div>
+
+<footer class="site-footer">
+  <p>有河濱球場的老照片或新照片想分享嗎？</p>
+  <a class="footer-contribute-btn" href="mailto:heatherlin.tw@gmail.com?subject=%E7%90%83%E5%A0%B4%E7%85%A7%E7%89%87%E6%8F%90%E4%BE%9B">📷 提供照片</a>
+</footer>
 
 <script>
 (function(){
