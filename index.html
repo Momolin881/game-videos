@@ -709,6 +709,233 @@
     .quickmark-btn, .goals-add-btn{ font-size: 16px; padding: 9px 14px; }
     .roster-x, .goal-x{ width: 15px; height: 15px; font-size: 10px; }
   }
+  /* ================= PHOTO ERA GALLERY (球場時代走廊) ================= */
+  .era-page{ max-width: 1040px; margin: 0 auto; padding: 8px 24px 72px; }
+  .era-header{
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding-top: 36px;
+    border-top: 1px solid var(--line-strong);
+  }
+  .era-eyebrow{
+    font-family: 'Teko', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--blue);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .era-eyebrow::before{ content:""; width:26px; height:2px; background: var(--blue-dim); }
+  .era-title{ font-weight: 900; font-size: clamp(24px, 4vw, 32px); margin: 0 0 8px; color: var(--text); }
+  .era-title .accent-char{ color: var(--red); }
+  .era-sub{ font-size: 13.5px; line-height: 1.75; color: var(--text-dim); margin: 0; max-width: 56ch; }
+  .era-hint{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    white-space: nowrap;
+    padding-bottom: 4px;
+  }
+
+  .era-lock{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 28px;
+    max-width: 380px;
+  }
+  .era-lock p{ margin: 0 0 14px; font-size: 13.5px; color: var(--text-dim); }
+  .era-lock input{
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--line-strong);
+    font-size: 14px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+  }
+  .era-lock button, .era-edit-pass button, .era-save-bar button, .era-album-head button{
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 9px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--line-strong);
+    background: var(--text);
+    color: #fff;
+    cursor: pointer;
+  }
+  .era-lock button:hover, .era-edit-pass button:hover, .era-save-bar button:hover, .era-album-head button:hover{ background: var(--blue-dim); }
+  .era-lock-msg{ margin-top: 10px; font-size: 12.5px; color: var(--red); min-height: 1.4em; }
+
+  .era-row{
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding: 4px 2px 14px;
+    scroll-snap-type: x proximity;
+  }
+  .era-card{
+    position: relative;
+    flex: 0 0 230px;
+    height: 290px;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    background: #fff;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .era-card:hover{ box-shadow: 0 10px 24px -10px rgba(10,12,16,0.3); transform: translateY(-2px); }
+  .era-card img{
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    background: linear-gradient(135deg, #e6e8ec, #d8dbe1);
+  }
+  .era-card .era-card-scrim{
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(10,10,12,0.88) 0%, rgba(10,10,12,0.08) 48%, transparent 68%);
+  }
+  .era-card .era-badge{
+    position: absolute; top: 10px; left: 10px;
+    font-family: 'Teko', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: #1a1a1a;
+    background: rgba(255,255,255,0.92);
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .era-card .era-card-info{ position: absolute; left: 14px; right: 14px; bottom: 12px; color: #fff; }
+  .era-card .era-card-title{ font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+  .era-card .era-card-desc{ font-size: 11.5px; line-height: 1.5; color: rgba(255,255,255,0.84); margin-bottom: 6px; }
+  .era-card .era-card-count{ font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.78); }
+  .era-card .era-card-tag{
+    position: absolute; top: 10px; right: 10px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(10,10,12,0.55);
+    padding: 3px 9px;
+    border-radius: 999px;
+    backdrop-filter: blur(2px);
+  }
+  .era-card .era-card-illustration{
+    width: 100%; height: 100%;
+    position: relative;
+    background: linear-gradient(145deg, #4a1220, #2c0b14);
+    overflow: hidden;
+  }
+  .era-card .era-card-illustration::before,
+  .era-card .era-card-illustration::after{
+    content: '';
+    position: absolute;
+    border: 1.5px solid rgba(255,120,130,0.35);
+    border-radius: 50%;
+  }
+  .era-card .era-card-illustration::before{ width: 150px; height: 150px; top: 35%; right: -30px; }
+  .era-card .era-card-illustration::after{ width: 90px; height: 90px; top: 55%; right: 55px; }
+
+  .era-album{ margin-top: 26px; }
+  .era-album-head{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .era-album-head .era-album-title{ font-weight: 700; font-size: 15px; color: var(--text); }
+  .era-album-head-btns{ display: flex; gap: 8px; }
+
+  .era-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+  }
+  .era-photo{
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    aspect-ratio: 1;
+    border: 1px solid var(--line);
+    background: #e6e8ec;
+  }
+  .era-photo img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+  .era-photo.era-new::before{
+    content: "新";
+    position: absolute; top: 6px; left: 6px;
+    background: var(--red);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    z-index: 2;
+  }
+  .era-photo[draggable="true"]{ cursor: grab; }
+  .era-photo.era-dragging{ opacity: 0.35; }
+  .era-photo.era-dragover{ outline: 2px solid var(--blue); outline-offset: -2px; }
+
+  .era-edit-pass{
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .era-edit-pass input{
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--line-strong);
+    font-size: 13px;
+  }
+  .era-edit-msg{ font-size: 12px; color: var(--red); }
+
+  .era-save-bar{ margin-top: 16px; display: flex; justify-content: flex-end; }
+
+  .era-modal{
+    position: fixed; inset: 0;
+    background: rgba(5,5,7,0.92);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 28px;
+    z-index: 11;
+  }
+  .era-modal.open{ display: flex; }
+  .era-modal-box{ position: relative; max-width: min(900px, 100%); max-height: 90vh; }
+  .era-modal-box img{ max-width: 100%; max-height: 90vh; display: block; border-radius: 10px; box-shadow: 0 30px 70px -20px rgba(0,0,0,0.7); }
+  .era-modal-close{
+    position: absolute; top: -42px; right: 0;
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--black-2);
+    border: 1px solid var(--on-black-line);
+    color: var(--on-black);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .era-modal-close:hover{ border-color: var(--red); color: var(--red); }
+
+  @media (max-width: 560px){
+    .era-page{ padding: 8px 18px 56px; }
+    .era-card{ flex: 0 0 190px; height: 240px; }
+  }
 </style>
 </head>
 <body>
@@ -760,6 +987,57 @@
     </div>
     <div id="rosterPanel" hidden></div>
     <div id="goalsPanel" hidden></div>
+  </div>
+</div>
+
+<div class="era-page" id="eraPage">
+  <div class="era-header">
+    <div>
+      <div class="era-eyebrow">Photo Archive</div>
+      <h2 class="era-title">球場<span class="accent-char">時代</span>走廊</h2>
+      <p class="era-sub">依時期整理的河濱球場照片集——橫向捲動瀏覽年代，點卡片展開該時期的完整相簿。</p>
+    </div>
+    <div class="era-hint">← 左右捲動 →</div>
+  </div>
+
+  <div class="era-lock" id="eraLock" hidden>
+    <p>這個相簿需要輸入瀏覽密碼才能看。</p>
+    <input type="password" id="eraLockInput" placeholder="輸入瀏覽密碼" autocomplete="off">
+    <button id="eraLockBtn" type="button">解鎖瀏覽</button>
+    <div class="era-lock-msg" id="eraLockMsg"></div>
+  </div>
+
+  <div class="era-content" id="eraContent">
+    <div class="era-row" id="eraRow"></div>
+
+    <div class="era-album" id="eraAlbum" hidden>
+      <div class="era-album-head">
+        <div class="era-album-title" id="eraAlbumTitle">—</div>
+        <div class="era-album-head-btns">
+          <button id="eraEditToggle" type="button">🔒 編輯排序</button>
+          <button id="eraAlbumBack" type="button">← 返回時期列表</button>
+        </div>
+      </div>
+
+      <div class="era-edit-pass" id="eraEditPass" hidden>
+        <input type="password" id="eraEditInput" placeholder="輸入編輯密碼" autocomplete="off">
+        <button id="eraEditUnlockBtn" type="button">解鎖編輯</button>
+        <span class="era-edit-msg" id="eraEditMsg"></span>
+      </div>
+
+      <div class="era-grid" id="eraGrid"></div>
+
+      <div class="era-save-bar" id="eraSaveBar" hidden>
+        <button id="eraSaveBtn" type="button">儲存排序</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="era-modal" id="eraModal">
+  <div class="era-modal-box">
+    <button class="era-modal-close" id="eraModalClose" aria-label="關閉">✕</button>
+    <img id="eraModalImg" src="" alt="">
   </div>
 </div>
 
@@ -1377,6 +1655,351 @@
       renderGroups(MOCK_FILES);
       contentEl.insertAdjacentHTML('afterbegin', '<div class="setup-note" style="margin-bottom:26px"><b>目前顯示示範版面。</b>即時資料讀取失敗（' + escapeHtml(err.message) + '），這通常是預覽環境本身的連線限制，正式網站上不會有這個狀況。</div>');
     });
+})();
+</script>
+
+<script>
+(function(){
+  // ---- Apps Script 後端網址：等 coordinator 部署完後填入 /exec 網址 ----
+  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyadNTqMsUk8R3zp9G2tLMUSH8Vl5DF5Njs7CU7CO7pGwzjUS9Z1C0giHlxwtMNxpG9/exec';
+
+  // 沿用既有影片區塊的同一組 Drive API Key
+  var ERA_API_KEY = 'AIzaSyB-hXDy6Nekjga9l8qMMHCVhgoZbQOQASE';
+
+  // 密碼不存明文，只存 SHA-256 雜湊，輸入值算完雜湊後字串比對
+  var BROWSE_HASH = '7fb1988958533f2c315c6c4f07735904610a945ace90a10312a4f8d210def008';
+  var EDIT_HASH = 'bcb2d84900fc4f5d34b93e148acf7c42c6d3cf68f1f53cc6ec28722be3200906';
+
+  var ERAS = [
+    { code:'00', title:'我小時候的球場', desc:'小時候的球場，照片是從老底片掃出來的，畫質很糙但很珍貴。', badge:'年代久遠‧底片掃描', tag:'真實照片', folderId:'1IXZpHEAED_PlrB4Swk2yf7u-yt4Es4DL' },
+    { code:'01', title:'舊河濱時期', desc:'還是舊場地的時候，街頭籃球味比較重。', badge:'整修前', tag:'真實照片', folderId:'1gHk60W1ow2D9kYypCp9u0FcJf_Dr3IUS' },
+    { code:'02', title:'淹水的河濱', desc:'颱風季淹過的那幾次，照片還在整理，之後補上。', badge:'整理中', tag:'示意圖‧整理中', illustration:true, folderId:'1IvNMLBj0ddO7skD3wupzFwj0oHZynf9n' },
+    { code:'03', title:'新河濱時期', desc:'重新鋪地、換新籃框後，也是現在固定開打的場地。', badge:'現在進行式', tag:'真實照片', folderId:'1fUhkTZtG4ylMjz4ocvr3_Konr59e0Wia' }
+  ];
+
+  var editUnlocked = false; // 編輯模式解鎖狀態不持久化，重新整理後要重輸入
+
+  var eraLock = document.getElementById('eraLock');
+  var eraLockInput = document.getElementById('eraLockInput');
+  var eraLockBtn = document.getElementById('eraLockBtn');
+  var eraLockMsg = document.getElementById('eraLockMsg');
+  var eraContent = document.getElementById('eraContent');
+  var eraRow = document.getElementById('eraRow');
+  var eraAlbum = document.getElementById('eraAlbum');
+  var eraAlbumTitle = document.getElementById('eraAlbumTitle');
+  var eraAlbumBack = document.getElementById('eraAlbumBack');
+  var eraEditToggle = document.getElementById('eraEditToggle');
+  var eraEditPass = document.getElementById('eraEditPass');
+  var eraEditInput = document.getElementById('eraEditInput');
+  var eraEditUnlockBtn = document.getElementById('eraEditUnlockBtn');
+  var eraEditMsg = document.getElementById('eraEditMsg');
+  var eraGrid = document.getElementById('eraGrid');
+  var eraSaveBar = document.getElementById('eraSaveBar');
+  var eraSaveBtn = document.getElementById('eraSaveBtn');
+  var eraModal = document.getElementById('eraModal');
+  var eraModalImg = document.getElementById('eraModalImg');
+  var eraModalClose = document.getElementById('eraModalClose');
+
+  function sha256Hex(text){
+    var enc = new TextEncoder().encode(text);
+    return crypto.subtle.digest('SHA-256', enc).then(function(buf){
+      var bytes = new Uint8Array(buf);
+      var hex = '';
+      for(var i=0; i<bytes.length; i++){
+        hex += bytes[i].toString(16).padStart(2, '0');
+      }
+      return hex;
+    });
+  }
+
+  function bigThumb(link){
+    if(!link) return '';
+    return link.replace(/=s\d+(-c)?$/, '=s1600');
+  }
+
+  // ---- Apps Script 串接（APPS_SCRIPT_URL 填好之前，退回本地預設行為） ----
+  function fetchSavedOrder(era){
+    if(!APPS_SCRIPT_URL) return Promise.resolve(null);
+    return fetch(APPS_SCRIPT_URL + '?action=getOrder&era=' + encodeURIComponent(era))
+      .then(function(r){ return r.json(); })
+      .then(function(data){ return (data && data.order) ? data.order : null; })
+      .catch(function(){ return null; });
+  }
+
+  function saveOrder(era, orderArray, editPasswordHash){
+    if(!APPS_SCRIPT_URL){
+      alert('尚未設定後端，無法儲存順序，請聯絡站長部署 Apps Script');
+      return Promise.resolve(false);
+    }
+    return fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action:'setOrder', era: era, order: orderArray, passwordHash: editPasswordHash })
+    }).then(function(r){ return r.json(); })
+      .then(function(data){
+        if(!data || !data.ok){
+          alert('儲存失敗：' + ((data && data.error) || '未知錯誤'));
+          return false;
+        }
+        return true;
+      }).catch(function(err){
+        alert('儲存失敗：' + err.message);
+        return false;
+      });
+  }
+
+  // ---- Drive API：取某時期資料夾裡的 jpeg 照片 ----
+  function fetchEraFiles(folderId){
+    var fields = 'files(id,name,thumbnailLink,createdTime)';
+    var q = "'" + folderId + "' in parents and mimeType='image/jpeg'";
+    var url = 'https://www.googleapis.com/drive/v3/files?q=' + encodeURIComponent(q) +
+      '&fields=' + encodeURIComponent(fields) + '&orderBy=createdTime&pageSize=1000&key=' + ERA_API_KEY;
+    return fetch(url)
+      .then(function(r){
+        if(!r.ok) return r.json().then(function(j){ throw new Error((j.error && j.error.message) || ('HTTP ' + r.status)); });
+        return r.json();
+      })
+      .then(function(data){ return data.files || []; })
+      .catch(function(err){
+        console.error('讀取時期照片失敗（' + folderId + '）：', err.message);
+        return [];
+      });
+  }
+
+  function renderEraRow(){
+    var html = '';
+    ERAS.forEach(function(era, i){
+      var cover = era.files && era.files.length ? era.files[0].thumbnailLink : '';
+      var count = era.files ? era.files.length : 0;
+      html += '<div class="era-card" data-era-idx="' + i + '">';
+      if(era.illustration){
+        html += '<div class="era-card-illustration"></div>';
+      } else if(cover){
+        html += '<img src="' + cover + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">';
+      }
+      html += '<div class="era-card-scrim"></div>';
+      if(era.tag){
+        html += '<span class="era-card-tag">' + escapeHtml(era.tag) + '</span>';
+      }
+      html += '<span class="era-badge">' + escapeHtml(era.badge) + '</span>';
+      html += '<div class="era-card-info">';
+      html += '<div class="era-card-title">' + escapeHtml(era.title) + '</div>';
+      html += '<div class="era-card-desc">' + escapeHtml(era.desc) + '</div>';
+      html += '<div class="era-card-count">📷 ' + count + ' 張照片</div>';
+      html += '</div></div>';
+    });
+    eraRow.innerHTML = html;
+    eraRow.querySelectorAll('.era-card').forEach(function(el){
+      el.addEventListener('click', function(){
+        openAlbum(ERAS[parseInt(el.getAttribute('data-era-idx'), 10)]);
+      });
+    });
+  }
+
+  function loadEras(){
+    Promise.all(ERAS.map(function(era){
+      return fetchEraFiles(era.folderId).then(function(files){ era.files = files; });
+    })).then(renderEraRow);
+  }
+
+  var currentEra = null;
+  var pendingEra = null;
+  var browseUnlocked = (localStorage.getItem('photoGalleryUnlocked') === '1');
+
+  function openAlbum(era){
+    if(!browseUnlocked){
+      pendingEra = era;
+      eraLockMsg.textContent = '';
+      eraLockInput.value = '';
+      eraLock.hidden = false;
+      eraLockInput.focus();
+      return;
+    }
+    currentEra = era;
+    era.savedOrder = null;
+    eraAlbumTitle.textContent = era.title + '（📷 ' + (era.files ? era.files.length : 0) + ' 張）';
+    eraAlbum.hidden = false;
+    exitEditMode();
+    eraGrid.innerHTML = '<div style="padding:20px;color:var(--text-faint);font-size:13px;">載入相簿順序…</div>';
+
+    fetchSavedOrder(era.code).then(function(order){
+      era.savedOrder = order;
+      era.displayFiles = applyOrder(era.files || [], order);
+      renderGrid();
+    });
+  }
+
+  function applyOrder(files, order){
+    if(!order || !order.length) return files.slice();
+    var byId = {};
+    files.forEach(function(f){ byId[f.id] = f; });
+    var ordered = [];
+    order.forEach(function(id){ if(byId[id]){ ordered.push(byId[id]); delete byId[id]; } });
+    Object.keys(byId).forEach(function(id){ ordered.push(byId[id]); }); // 新照片（不在已存順序裡）
+    return ordered;
+  }
+
+  function isNewPhoto(file){
+    if(!currentEra || !currentEra.savedOrder) return false;
+    return currentEra.savedOrder.indexOf(file.id) === -1;
+  }
+
+  function renderGrid(){
+    var files = (currentEra && currentEra.displayFiles) || [];
+    var html = '';
+    files.forEach(function(f, i){
+      var newFlag = isNewPhoto(f) && editUnlocked;
+      html += '<div class="era-photo' + (newFlag ? ' era-new' : '') + '"' +
+        (editUnlocked ? ' draggable="true"' : '') +
+        ' data-photo-idx="' + i + '" data-file-id="' + f.id + '">';
+      html += '<img src="' + (f.thumbnailLink || '') + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">';
+      html += '</div>';
+    });
+    eraGrid.innerHTML = html;
+
+    eraGrid.querySelectorAll('.era-photo').forEach(function(el){
+      if(editUnlocked){
+        el.addEventListener('dragstart', onDragStart);
+        el.addEventListener('dragover', onDragOver);
+        el.addEventListener('dragleave', onDragLeave);
+        el.addEventListener('drop', onDrop);
+        el.addEventListener('dragend', onDragEnd);
+      } else {
+        el.addEventListener('click', function(){
+          var idx = parseInt(el.getAttribute('data-photo-idx'), 10);
+          openLightbox(files[idx]);
+        });
+      }
+    });
+  }
+
+  var dragSrcIdx = null;
+
+  function onDragStart(e){
+    dragSrcIdx = parseInt(this.getAttribute('data-photo-idx'), 10);
+    this.classList.add('era-dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  }
+  function onDragOver(e){
+    e.preventDefault();
+    this.classList.add('era-dragover');
+  }
+  function onDragLeave(){
+    this.classList.remove('era-dragover');
+  }
+  function onDrop(e){
+    e.preventDefault();
+    this.classList.remove('era-dragover');
+    var targetIdx = parseInt(this.getAttribute('data-photo-idx'), 10);
+    if(dragSrcIdx === null || dragSrcIdx === targetIdx) return;
+    var files = currentEra.displayFiles;
+    var moved = files.splice(dragSrcIdx, 1)[0];
+    files.splice(targetIdx, 0, moved);
+    renderGrid();
+  }
+  function onDragEnd(){
+    eraGrid.querySelectorAll('.era-photo').forEach(function(el){ el.classList.remove('era-dragging', 'era-dragover'); });
+    dragSrcIdx = null;
+  }
+
+  function enterEditMode(){
+    editUnlocked = true;
+    eraEditPass.hidden = true;
+    eraSaveBar.hidden = false;
+    eraEditToggle.textContent = '🔓 編輯中（拖拉排序）';
+    renderGrid();
+  }
+
+  function exitEditMode(){
+    eraSaveBar.hidden = true;
+    eraEditToggle.textContent = '🔒 編輯排序';
+    if(eraEditPass) eraEditPass.hidden = true;
+  }
+
+  eraEditToggle.addEventListener('click', function(){
+    if(editUnlocked){
+      // 已解鎖過編輯密碼：直接切換目前相簿進入編輯狀態
+      enterEditMode();
+      return;
+    }
+    eraEditPass.hidden = !eraEditPass.hidden;
+    eraEditMsg.textContent = '';
+  });
+
+  eraEditUnlockBtn.addEventListener('click', function(){
+    var val = eraEditInput.value || '';
+    sha256Hex(val).then(function(hex){
+      if(hex === EDIT_HASH){
+        eraEditInput.value = '';
+        enterEditMode();
+      } else {
+        eraEditMsg.textContent = '編輯密碼不對，再試一次。';
+      }
+    });
+  });
+
+  eraSaveBtn.addEventListener('click', function(){
+    if(!currentEra) return;
+    var order = currentEra.displayFiles.map(function(f){ return f.id; });
+    saveOrder(currentEra.code, order, EDIT_HASH).then(function(ok){
+      if(ok){
+        currentEra.savedOrder = order;
+        renderGrid();
+      }
+    });
+  });
+
+  eraAlbumBack.addEventListener('click', function(){
+    eraAlbum.hidden = true;
+    exitEditMode();
+    currentEra = null;
+  });
+
+  function openLightbox(file){
+    if(!file) return;
+    eraModalImg.src = bigThumb(file.thumbnailLink);
+    eraModal.classList.add('open');
+  }
+  function closeLightbox(){
+    eraModal.classList.remove('open');
+    eraModalImg.src = '';
+  }
+  eraModalClose.addEventListener('click', closeLightbox);
+  eraModal.addEventListener('click', function(e){ if(e.target === eraModal) closeLightbox(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLightbox(); });
+
+  // ---- 瀏覽密碼門檻（卡片列表任何人都看得到，只在要展開相簿時才跳出密碼框）----
+  loadEras();
+
+  function unlockBrowse(){
+    browseUnlocked = true;
+    eraLock.hidden = true;
+    if(pendingEra){
+      var era = pendingEra;
+      pendingEra = null;
+      openAlbum(era);
+    }
+  }
+
+  eraLockBtn.addEventListener('click', function(){
+    var val = eraLockInput.value || '';
+    sha256Hex(val).then(function(hex){
+      if(hex === BROWSE_HASH){
+        localStorage.setItem('photoGalleryUnlocked', '1');
+        unlockBrowse();
+      } else {
+        eraLockMsg.textContent = '密碼不對，再試一次。';
+      }
+    });
+  });
+  eraLockInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') eraLockBtn.click(); });
+  eraEditInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') eraEditUnlockBtn.click(); });
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
 })();
 </script>
 </body>
