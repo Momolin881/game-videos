@@ -966,6 +966,16 @@
     background: #e6e8ec;
   }
   .era-photo img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+  .era-photo-date{
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to top, rgba(10,10,12,0.78), transparent);
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 14px 6px 5px;
+    text-align: center;
+    pointer-events: none;
+  }
   .era-photo.era-new::before{
     content: "新";
     position: absolute; top: 6px; left: 6px;
@@ -1999,8 +2009,9 @@
       ? 'files(id,name,thumbnailLink,createdTime,videoMediaMetadata)'
       : 'files(id,name,thumbnailLink,createdTime)';
     var q = "'" + folderId + "' in parents and " + mimeFilter;
+    var orderBy = era.isVideo ? 'name' : 'createdTime';
     var url = 'https://www.googleapis.com/drive/v3/files?q=' + encodeURIComponent(q) +
-      '&fields=' + encodeURIComponent(fields) + '&orderBy=createdTime&pageSize=1000&key=' + ERA_API_KEY;
+      '&fields=' + encodeURIComponent(fields) + '&orderBy=' + orderBy + '&pageSize=1000&key=' + ERA_API_KEY;
     return fetch(url)
       .then(function(r){
         if(!r.ok) return r.json().then(function(j){ throw new Error((j.error && j.error.message) || ('HTTP ' + r.status)); });
@@ -2093,6 +2104,12 @@
     return currentEra.savedOrder.indexOf(file.id) === -1;
   }
 
+  function videoDateLabel(name){
+    var m = (name || '').match(/^(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})/);
+    if(!m) return '';
+    return m[1] + '/' + m[2] + '/' + m[3] + ' ' + m[4] + ':' + m[5];
+  }
+
   function renderGrid(){
     var files = (currentEra && currentEra.displayFiles) || [];
     var html = '';
@@ -2102,6 +2119,10 @@
         (editUnlocked ? ' draggable="true"' : '') +
         ' data-photo-idx="' + i + '" data-file-id="' + f.id + '">';
       html += '<img src="' + (f.thumbnailLink || '') + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">';
+      if(currentEra && currentEra.isVideo){
+        var lbl = videoDateLabel(f.name);
+        if(lbl) html += '<span class="era-photo-date">' + escapeHtml(lbl) + '</span>';
+      }
       html += '</div>';
     });
     eraGrid.innerHTML = html;
