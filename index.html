@@ -922,6 +922,7 @@
     border-radius: 999px;
     backdrop-filter: blur(2px);
   }
+  .era-card .era-card-tag-red{ color: var(--red); }
   .era-card .era-card-illustration{
     width: 100%; height: 100%;
     position: relative;
@@ -1104,7 +1105,7 @@
     <div>
       <div class="era-eyebrow">Photo Archive</div>
       <h2 class="era-title">球場<span class="accent-char">時代</span>走廊</h2>
-      <p class="era-sub">依時期整理的河濱球場照片集——橫向捲動瀏覽年代，點卡片展開該時期的完整相簿。</p>
+      <p class="era-sub">依時期整理的河濱球場照片集——橫向捲動瀏覽年代，點卡片展開該時期的完整相簿。（相簿裡有彩蛋）</p>
     </div>
     <div class="era-hint">← 左右捲動 →</div>
   </div>
@@ -2025,13 +2026,13 @@
       }
       html += '<div class="era-card-scrim"></div>';
       if(era.tag){
-        html += '<span class="era-card-tag">' + escapeHtml(era.tag) + '</span>';
+        html += '<span class="era-card-tag' + (era.isVideo ? ' era-card-tag-red' : '') + '">' + escapeHtml(era.tag) + '</span>';
       }
       html += '<span class="era-badge">' + escapeHtml(era.badge) + '</span>';
       html += '<div class="era-card-info">';
       html += '<div class="era-card-title">' + escapeHtml(era.title) + '</div>';
       html += '<div class="era-card-desc">' + escapeHtml(era.desc) + '</div>';
-      html += '<div class="era-card-count">📷 ' + count + ' 張照片</div>';
+      html += '<div class="era-card-count">' + (era.isVideo ? '🎬 ' + count + ' 支影片' : '📷 ' + count + ' 張照片') + '</div>';
       html += '</div></div>';
     });
     eraRow.innerHTML = html;
@@ -2063,7 +2064,9 @@
     }
     currentEra = era;
     era.savedOrder = null;
-    eraAlbumTitle.textContent = era.title + '（📷 ' + (era.files ? era.files.length : 0) + ' 張）';
+    eraAlbumTitle.textContent = era.title + (era.isVideo
+      ? '（🎬 ' + (era.files ? era.files.length : 0) + ' 支）'
+      : '（📷 ' + (era.files ? era.files.length : 0) + ' 張）');
     eraAlbum.hidden = false;
     exitEditMode();
     eraGrid.innerHTML = '<div style="padding:20px;color:var(--text-faint);font-size:13px;">載入相簿順序…</div>';
