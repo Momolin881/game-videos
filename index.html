@@ -479,6 +479,103 @@
   }
   .card .info .dur{ color: rgba(255,255,255,0.8); flex: 0 0 auto; }
 
+  /* ---- past-month sections: collapsed-by-default thumbnail grid ---- */
+  .month-section{ margin-bottom: 40px; }
+  .month-section:last-child{ margin-bottom: 0; }
+  .month-head{
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .month-head .m{
+    font-family: 'Teko', sans-serif;
+    font-weight: 600;
+    font-size: 26px;
+    color: var(--text-dim);
+  }
+  .month-head .n{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    color: var(--text-faint);
+  }
+
+  .month-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: 10px;
+  }
+  .month-tile{
+    position: relative;
+    aspect-ratio: 4/3;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    background: #fff;
+    transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
+  }
+  .month-tile:hover{
+    box-shadow: 0 8px 18px -8px rgba(10,12,16,0.35);
+    transform: translateY(-2px);
+    border-color: var(--blue);
+  }
+  .month-tile img{
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    background: linear-gradient(135deg, #e6e8ec, #d8dbe1);
+  }
+  .month-tile .scrim{
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(10,10,12,0.88) 0%, rgba(10,10,12,0.1) 50%, transparent 68%);
+  }
+  .month-tile .gd{
+    position: absolute; top: 6px; right: 7px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    color: rgba(255,255,255,0.65);
+    letter-spacing: 0.03em;
+  }
+  .month-tile .meta{ position: absolute; left: 8px; right: 8px; bottom: 6px; }
+  .month-tile .date{
+    font-family: 'Teko', sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    color: #fff;
+    line-height: 1;
+  }
+  .month-tile .count{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    color: rgba(255,255,255,0.8);
+  }
+  .month-tile.is-open{ border-color: var(--red); }
+
+  .tile-detail{
+    display: none;
+    margin-top: 14px;
+    padding: 16px 16px 4px;
+    border-radius: 10px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+  }
+  .tile-detail.is-open{ display: block; }
+  .tile-detail .d-head{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    color: var(--text-faint);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tile-detail .d-head b{
+    font-family: 'Noto Sans TC', sans-serif;
+    color: var(--text);
+    font-weight: 700;
+  }
+
   /* ---- player modal ---- */
   .modal{
     position: fixed; inset: 0;
@@ -657,15 +754,7 @@
   .meta-row{
     margin-top: 32px;
     padding-top: 20px;
-    border-top: 1px solid var(--line-strong);
     color: var(--text-faint);
-  }
-  .meta-label{
-    font-size: 16px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-faint);
-    margin: 0 0 10px;
   }
   .meta-text{
     font-size: 16px;
@@ -918,7 +1007,7 @@
   }
   .era-modal.open{ display: flex; }
   .era-modal-box{ position: relative; max-width: min(900px, 100%); max-height: 90vh; }
-  .era-modal-box img{ max-width: 100%; max-height: 90vh; display: block; border-radius: 10px; box-shadow: 0 30px 70px -20px rgba(0,0,0,0.7); }
+  .era-modal-box img, .era-modal-box video{ max-width: 100%; max-height: 90vh; display: block; border-radius: 10px; box-shadow: 0 30px 70px -20px rgba(0,0,0,0.7); }
   .era-modal-close{
     position: absolute; top: -42px; right: 0;
     width: 34px; height: 34px;
@@ -988,9 +1077,7 @@
   <div id="content"></div>
 
   <div class="meta-row">
-    <div class="meta-label">・FULL COURT ARCHIVE・</div>
-    <p class="meta-text">點縮圖進場，手機也能看，「建議」最佳觀賞在電腦螢幕。</p>
-    <p class="meta-text">頁面採即時讀取雲端檔案，偶爾卡頓請稍後或隔天再試。</p>
+    <p class="meta-text">點縮圖進場，手機也能看，「建議」最佳觀賞在電腦螢幕。頁面採即時讀取雲端檔案，偶爾卡頓請稍後或隔天再試。</p>
   </div>
 </div>
 
@@ -1059,6 +1146,7 @@
   <div class="era-modal-box">
     <button class="era-modal-close" id="eraModalClose" aria-label="關閉">✕</button>
     <img id="eraModalImg" src="" alt="">
+    <video id="eraModalVideo" controls playsinline hidden></video>
   </div>
 </div>
 
@@ -1479,6 +1567,20 @@
       section.hidden = !!(matchSet && visible === 0);
       if(matchSet && visible > 0) section.classList.remove('collapsed');
     });
+    // 過去月份縮圖展開後的明細（.tile-detail 裡的卡片）也要套用同一份篩選狀態，
+    // 不然展開新的月份卡片會暫時看不到篩選效果，要等下次點篩選鈕才生效。
+    contentEl.querySelectorAll('.tile-detail').forEach(function(detail){
+      var total = 0, visible = 0;
+      detail.querySelectorAll('.card').forEach(function(card){
+        total++;
+        var fid = card.getAttribute('data-fileid');
+        var show = !matchSet || matchSet.indexOf(fid) !== -1;
+        card.style.display = show ? '' : 'none';
+        if(show) visible++;
+      });
+      var countEl = detail.querySelector('.d-head span');
+      if(countEl && total) countEl.textContent = matchSet ? (visible + ' / ' + total + ' 支影片') : (total + ' 支影片');
+    });
   }
 
   // 把球員名單蓋到縮圖上——一次讀整個 players 集合（而不是每張卡片各讀一次），
@@ -1522,6 +1624,41 @@
     activeGoalsController.quickMark();
   });
 
+  // 把一天的影片清單渲染成卡片列（本月展開的 Game Day、以及過去月份縮圖點開後的明細，共用這份 markup）。
+  function renderCardGrid(list, latestTime, CARD_HEIGHT){
+    var html = '';
+    list.forEach(function(f){
+      var vmm = f.videoMediaMetadata || {};
+      var w = vmm.width || 16, h = vmm.height || 9;
+      var ratio = w / h;
+      var widthPx = Math.round(CARD_HEIGHT * ratio);
+      var isLatest = f.__ts === latestTime;
+      var dur = fmtDuration(vmm.durationMillis);
+      var thumb = f.thumbnailLink || '';
+      html += '<div class="card" style="width:' + widthPx + 'px; aspect-ratio:' + w + '/' + h + '" data-idx="' + f.__idx + '" data-fileid="' + escapeHtml(f.id) + '">';
+      if(thumb){
+        html += '<img src="' + thumb + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">';
+      }
+      html += '<div class="scrim"></div>';
+      if(isLatest){ html += '<span class="tag">最新</span>'; }
+      html += '<div class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>';
+      html += '<div class="info"><span class="players-tag"></span><span class="dur">' + dur + '</span></div>';
+      html += '</div>';
+    });
+    return html;
+  }
+
+  // 幫新插入 DOM 的卡片（不論是本月展開區塊、還是過去月份點開的明細）綁上點擊開播放器。
+  function bindCardClicks(root, files){
+    root.querySelectorAll('.card').forEach(function(el){
+      if(el.__gvBound) return;
+      el.__gvBound = true;
+      el.addEventListener('click', function(){
+        openPlayer(files[parseInt(el.getAttribute('data-idx'), 10)]);
+      });
+    });
+  }
+
   function renderGroups(files){
     statusEl.classList.add('hidden');
 
@@ -1546,54 +1683,94 @@
     // 手機版改成單欄滿版、用 aspect-ratio 算高度，這個值在手機上不會用到。
     var CARD_HEIGHT = 176;
 
+    // 以「今天」為基準切本月／過去月份；全域 Game Day 編號（gameNo）不因切月份而重置，
+    // 跟現況一樣由新到舊連續編號，只是過去月份改用縮圖網格呈現，不再逐一攤平全展開。
+    var now = new Date();
+    var curMonthKey = now.getFullYear() + '-' + (now.getMonth() + 1);
+    function monthKeyOf(ts){
+      var d = new Date(ts);
+      return d.getFullYear() + '-' + (d.getMonth() + 1);
+    }
+    function monthTitleOf(ts){
+      var d = new Date(ts);
+      return (d.getMonth() + 1) + '月';
+    }
+
+    var dayMetas = order.map(function(k, gi){
+      var list = groups[k].slice().sort(function(a, b){ return b.__ts - a.__ts; });
+      return {
+        key: k,
+        list: list,
+        gi: gi,
+        gameNo: order.length - gi,
+        monthKey: monthKeyOf(list[0].__ts)
+      };
+    });
+
+    var curDayMetas = dayMetas.filter(function(dm){ return dm.monthKey === curMonthKey; });
+    var pastDayMetas = dayMetas.filter(function(dm){ return dm.monthKey !== curMonthKey; });
+
+    // ---- 本月：跟現況完全一樣的全展開卡片列 + 日期跳轉列（只涵蓋本月） ----
     var jumpsHtml = '';
-    if(order.length > 1){
+    if(curDayMetas.length > 1){
       jumpsHtml += '<div class="day-jumps">';
-      order.forEach(function(k, gi){
-        var jdl = dayLabel(groups[k][0].__ts);
-        jumpsHtml += '<button type="button" class="day-jump' + (gi === 0 ? ' is-latest' : '') + '" data-daykey="' + escapeHtml(k) + '">' + jdl.num + '</button>';
+      curDayMetas.forEach(function(dm){
+        var jdl = dayLabel(dm.list[0].__ts);
+        jumpsHtml += '<button type="button" class="day-jump' + (dm.gi === 0 ? ' is-latest' : '') + '" data-daykey="' + escapeHtml(dm.key) + '">' + jdl.num + '</button>';
       });
       jumpsHtml += '</div>';
     }
 
-    var html = '';
-    order.forEach(function(k, gi){
-      var list = groups[k].slice().sort(function(a, b){ return b.__ts - a.__ts; });
-      var dl = dayLabel(list[0].__ts);
-      var gameNo = String(order.length - gi).padStart(2, '0');
-      var collapsed = gi >= EXPANDED_BY_DEFAULT;
-      html += '<section class="day-group' + (collapsed ? ' collapsed' : '') + '" id="day-' + escapeHtml(k) + '">';
-      html += '<div class="day-overline">Game Day ' + gameNo + '</div>';
-      html += '<div class="day-head"><span class="day-num">' + dl.num + '</span><span class="day-label">' + dl.label + '</span><span class="day-count">' + list.length + ' 支影片</span><span class="day-toggle">▾</span></div>';
-      html += '<div class="card-grid">';
-      list.forEach(function(f, i){
-        var vmm = f.videoMediaMetadata || {};
-        var w = vmm.width || 16, h = vmm.height || 9;
-        var ratio = w / h;
-        var widthPx = Math.round(CARD_HEIGHT * ratio);
-        var isLatest = f.__ts === latestTime;
-        var dur = fmtDuration(vmm.durationMillis);
-        var thumb = f.thumbnailLink || '';
-        html += '<div class="card" style="width:' + widthPx + 'px; aspect-ratio:' + w + '/' + h + '" data-idx="' + f.__idx + '" data-fileid="' + escapeHtml(f.id) + '">';
+    var curHtml = '';
+    curDayMetas.forEach(function(dm){
+      var dl = dayLabel(dm.list[0].__ts);
+      var gameNo = String(dm.gameNo).padStart(2, '0');
+      var collapsed = dm.gi >= EXPANDED_BY_DEFAULT;
+      curHtml += '<section class="day-group' + (collapsed ? ' collapsed' : '') + '" id="day-' + escapeHtml(dm.key) + '">';
+      curHtml += '<div class="day-overline">Game Day ' + gameNo + '</div>';
+      curHtml += '<div class="day-head"><span class="day-num">' + dl.num + '</span><span class="day-label">' + dl.label + '</span><span class="day-count">' + dm.list.length + ' 支影片</span><span class="day-toggle">▾</span></div>';
+      curHtml += '<div class="card-grid">' + renderCardGrid(dm.list, latestTime, CARD_HEIGHT) + '</div>';
+      curHtml += '</section>';
+    });
+
+    // ---- 上個月（含）以前：每個月一個縮圖網格，點縮圖才展開該天完整卡片列 ----
+    var pastMonthOrder = [];
+    var pastMonthBuckets = {};
+    pastDayMetas.forEach(function(dm){
+      if(!pastMonthBuckets[dm.monthKey]){ pastMonthBuckets[dm.monthKey] = []; pastMonthOrder.push(dm.monthKey); }
+      pastMonthBuckets[dm.monthKey].push(dm);
+    });
+
+    var pastHtml = '';
+    pastMonthOrder.forEach(function(mk, mi){
+      var bucket = pastMonthBuckets[mk];
+      var monthTitle = monthTitleOf(bucket[0].list[0].__ts);
+      var detailId = 'monthDetail-' + mi;
+      pastHtml += '<div class="month-section">';
+      pastHtml += '<div class="month-head"><span class="m">' + monthTitle + '</span><span class="n">' + bucket.length + ' 場</span></div>';
+      pastHtml += '<div class="month-grid">';
+      bucket.forEach(function(dm){
+        var dl = dayLabel(dm.list[0].__ts);
+        var latestOfDay = dm.list[0]; // 已依 __ts 新到舊排序
+        var thumb = latestOfDay.thumbnailLink || '';
+        var gameNo = String(dm.gameNo).padStart(2, '0');
+        pastHtml += '<div class="month-tile" data-tilekey="' + escapeHtml(dm.key) + '" data-detail="' + detailId + '">';
         if(thumb){
-          html += '<img src="' + thumb + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">';
+          pastHtml += '<img src="' + thumb + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">';
         }
-        html += '<div class="scrim"></div>';
-        if(isLatest){ html += '<span class="tag">最新</span>'; }
-        html += '<div class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>';
-        html += '<div class="info"><span class="players-tag"></span><span class="dur">' + dur + '</span></div>';
-        html += '</div>';
+        pastHtml += '<div class="scrim"></div>';
+        pastHtml += '<span class="gd">GD ' + gameNo + '</span>';
+        pastHtml += '<div class="meta"><div class="date">' + dl.num + '</div><div class="count">' + dm.list.length + ' 支</div></div>';
+        pastHtml += '</div>';
       });
-      html += '</div></section>';
+      pastHtml += '</div>';
+      pastHtml += '<div class="tile-detail" id="' + detailId + '"><div class="d-head"><b></b><span></span></div><div class="card-grid"></div></div>';
+      pastHtml += '</div>';
     });
 
-    contentEl.innerHTML = jumpsHtml + html;
+    contentEl.innerHTML = jumpsHtml + curHtml + pastHtml;
 
-    contentEl.querySelectorAll('.card').forEach(function(el){
-      el.addEventListener('click', function(){
-        openPlayer(files[parseInt(el.getAttribute('data-idx'), 10)]);
-      });
-    });
+    bindCardClicks(contentEl, files);
 
     contentEl.querySelectorAll('.day-head').forEach(function(el){
       el.addEventListener('click', function(){
@@ -1608,6 +1785,40 @@
         if(!section) return;
         section.classList.remove('collapsed');
         section.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      });
+    });
+
+    // 過去月份的縮圖方塊：點一下在同月份的 tile-detail 裡展開該天完整卡片列，再點一次收起。
+    contentEl.querySelectorAll('.month-tile').forEach(function(tile){
+      var tileKey = tile.getAttribute('data-tilekey');
+      var dm = pastDayMetas.filter(function(d){ return d.key === tileKey; })[0];
+      if(!dm) return;
+      tile.addEventListener('click', function(){
+        var detail = document.getElementById(tile.getAttribute('data-detail'));
+        if(!detail) return;
+        var alreadyOpen = detail.dataset.openKey === tileKey;
+        if(alreadyOpen){
+          detail.classList.remove('is-open');
+          detail.dataset.openKey = '';
+          tile.classList.remove('is-open');
+          return;
+        }
+        var prevKey = detail.dataset.openKey;
+        if(prevKey){
+          var prevTile = contentEl.querySelector('.month-tile[data-tilekey="' + prevKey + '"]');
+          if(prevTile) prevTile.classList.remove('is-open');
+        }
+        var dl = dayLabel(dm.list[0].__ts);
+        detail.querySelector('.d-head b').textContent = dl.label;
+        detail.querySelector('.d-head span').textContent = dm.list.length + ' 支影片';
+        var grid = detail.querySelector('.card-grid');
+        grid.innerHTML = renderCardGrid(dm.list, latestTime, CARD_HEIGHT);
+        bindCardClicks(grid, files);
+        detail.classList.add('is-open');
+        detail.dataset.openKey = tileKey;
+        tile.classList.add('is-open');
+        refreshPlayerTags();
+        detail.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
       });
     });
 
@@ -1700,7 +1911,8 @@
     { code:'03', title:'新河濱時期', desc:'重新鋪地、換新籃框後，也是現在固定開打的場地。', badge:'現在進行式', tag:'真實照片', folderId:'1fUhkTZtG4ylMjz4ocvr3_Konr59e0Wia' },
     { code:'02', title:'曾經淹水的河濱', desc:'颱風淹過的那幾次，差點讓球場團滅。', badge:'整理中', tag:'示意圖‧整理中', illustration:true, folderId:'1IvNMLBj0ddO7skD3wupzFwj0oHZynf9n' },
     { code:'01', title:'舊河濱時期', desc:'經歷水泥地、沒有路燈的古時候，街頭籃球味比較重。', badge:'整修前', tag:'真實照片', folderId:'1gHk60W1ow2D9kYypCp9u0FcJf_Dr3IUS' },
-    { code:'00', title:'我小時候的球場', desc:'小時候的球場，照片是從老底片掃出來的，畫質很糙但很珍貴。', badge:'年代久遠‧底片掃描', tag:'真實照片', folderId:'1IXZpHEAED_PlrB4Swk2yf7u-yt4Es4DL' }
+    { code:'00', title:'我小時候的球場', desc:'小時候的球場，照片是從老底片掃出來的，畫質很糙但很珍貴。', badge:'年代久遠‧底片掃描', tag:'真實照片', folderId:'1IXZpHEAED_PlrB4Swk2yf7u-yt4Es4DL' },
+    { code:'04', title:'我的NBA年代', desc:'場邊幕後花絮和精彩回放，陸續更新中，敬請期待！', badge:'本放死守', tag:'真實影片', isVideo:true, folderId:'1_2IKNnWzvdMjyXOTe51jj9a8IABkzwNH' }
   ];
 
   var editUnlocked = false; // 編輯模式解鎖狀態不持久化，重新整理後要重輸入
@@ -1724,6 +1936,7 @@
   var eraSaveBtn = document.getElementById('eraSaveBtn');
   var eraModal = document.getElementById('eraModal');
   var eraModalImg = document.getElementById('eraModalImg');
+  var eraModalVideo = document.getElementById('eraModalVideo');
   var eraModalClose = document.getElementById('eraModalClose');
 
   function sha256Hex(text){
@@ -1774,10 +1987,16 @@
       });
   }
 
-  // ---- Drive API：取某時期資料夾裡的 jpeg 照片 ----
-  function fetchEraFiles(folderId){
-    var fields = 'files(id,name,thumbnailLink,createdTime)';
-    var q = "'" + folderId + "' in parents and mimeType='image/jpeg'";
+  // ---- Drive API：取某時期資料夾裡的照片（或影片）----
+  function fetchEraFiles(era){
+    var folderId = era.folderId;
+    var mimeFilter = era.isVideo
+      ? "(mimeType='video/mp4' or mimeType='video/quicktime')"
+      : "mimeType='image/jpeg'";
+    var fields = era.isVideo
+      ? 'files(id,name,thumbnailLink,createdTime,videoMediaMetadata)'
+      : 'files(id,name,thumbnailLink,createdTime)';
+    var q = "'" + folderId + "' in parents and " + mimeFilter;
     var url = 'https://www.googleapis.com/drive/v3/files?q=' + encodeURIComponent(q) +
       '&fields=' + encodeURIComponent(fields) + '&orderBy=createdTime&pageSize=1000&key=' + ERA_API_KEY;
     return fetch(url)
@@ -1824,7 +2043,7 @@
 
   function loadEras(){
     Promise.all(ERAS.map(function(era){
-      return fetchEraFiles(era.folderId).then(function(files){ era.files = files; });
+      return fetchEraFiles(era).then(function(files){ era.files = files; });
     })).then(renderEraRow);
   }
 
@@ -1983,12 +2202,27 @@
 
   function openLightbox(file){
     if(!file) return;
-    eraModalImg.src = bigThumb(file.thumbnailLink);
-    eraModal.classList.add('open');
+    if(currentEra && currentEra.isVideo){
+      eraModalImg.hidden = true;
+      eraModalImg.src = '';
+      eraModalVideo.hidden = false;
+      eraModalVideo.src = 'https://www.googleapis.com/drive/v3/files/' + file.id + '?alt=media&key=' + ERA_API_KEY;
+      eraModal.classList.add('open');
+      eraModalVideo.play().catch(function(){});
+    } else {
+      eraModalVideo.hidden = true;
+      eraModalVideo.pause();
+      eraModalVideo.src = '';
+      eraModalImg.hidden = false;
+      eraModalImg.src = bigThumb(file.thumbnailLink);
+      eraModal.classList.add('open');
+    }
   }
   function closeLightbox(){
     eraModal.classList.remove('open');
     eraModalImg.src = '';
+    eraModalVideo.pause();
+    eraModalVideo.src = '';
   }
   eraModalClose.addEventListener('click', closeLightbox);
   eraModal.addEventListener('click', function(e){ if(e.target === eraModal) closeLightbox(); });
