@@ -28,6 +28,10 @@
     --blue: #1a4fb4;
     --blue-dim: #123a87;
     --blue-soft: rgba(26,79,180,0.12);
+
+    --gold: #f2b705;
+    --gold-dim: #c89004;
+    --gold-glow: rgba(242,183,5,0.45);
   }
 
   *{ box-sizing: border-box; }
@@ -798,6 +802,18 @@
     .goal-scorer-input{ font-size: 10px; width: 46px; }
     .quickmark-btn, .goals-add-btn{ font-size: 16px; padding: 9px 14px; }
     .roster-x, .goal-x{ width: 15px; height: 15px; font-size: 10px; }
+
+    .wx-widget{ margin-top: 22px; }
+    .wx-bar{ padding: 15px 16px; gap: 10px; }
+    .wx-bar .cam-name{ display: none; }
+    .wx-bar .sep{ display: none; }
+    .wx-bar .live-tag{ font-size: 19px; }
+    .wx-bar .chev{ font-size: 15px; }
+    .wx-video{ aspect-ratio: 16 / 9; }
+    .wx-video .wx-fallback{ font-size: 13px; max-width: 85%; }
+    .wx-foot{ padding: 11px 16px; }
+    .wx-foot .src{ font-size: 12px; }
+    .wx-foot a{ font-size: 12px; }
   }
   /* ================= PHOTO ERA GALLERY (球場時代走廊) ================= */
   .era-page{ max-width: 1040px; margin: 0 auto; padding: 8px 24px 72px; }
@@ -1058,6 +1074,173 @@
     text-decoration: none;
   }
   .footer-contribute-btn:hover{ background: var(--blue-dim, var(--blue)); opacity: 0.9; }
+
+  /* ================= LIVE 即時影像工具列 ================= */
+  .wx-widget{
+    margin-top: 28px;
+    background: #050506;
+    border: 1px solid var(--on-black-line);
+    border-radius: 12px;
+    overflow: hidden;
+    animation: wxGoldGlow 3.6s ease-in-out infinite;
+  }
+  .wx-widget.is-expanded{
+    animation: none;
+    border-color: var(--on-black-line);
+    box-shadow: none;
+  }
+  @keyframes wxGoldGlow{
+    0%, 100%{ box-shadow: 0 0 6px 0 var(--gold-glow); border-color: var(--on-black-line); }
+    50%{ box-shadow: 0 0 22px 4px var(--gold-glow); border-color: var(--gold-dim); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .wx-widget{ animation: none; }
+  }
+  .wx-bar{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 22px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--on-black-line);
+    width: 100%;
+    text-align: left;
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+  .wx-bar .live-dot{
+    width: 10px; height: 10px; border-radius: 50%; background: var(--red); flex-shrink: 0;
+    box-shadow: 0 0 0 0 rgba(226,32,44,0.6); animation: wxPulse 1.8s infinite;
+  }
+  @keyframes wxPulse{
+    0%{ box-shadow: 0 0 0 0 rgba(226,32,44,0.55); }
+    70%{ box-shadow: 0 0 0 9px rgba(226,32,44,0); }
+    100%{ box-shadow: 0 0 0 0 rgba(226,32,44,0); }
+  }
+  .wx-bar .live-tag{
+    font-family: 'Teko', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: 0.06em;
+    color: var(--on-black);
+    flex-shrink: 0;
+  }
+  .wx-bar .sep{ width: 1px; height: 18px; background: var(--on-black-line); flex-shrink: 0; }
+  .wx-bar .cam-name{ font-size: 16px; color: var(--on-black-dim); font-weight: 500; flex-shrink: 0; }
+  .wx-bar .wx-reading{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    color: var(--on-black-dim);
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .wx-bar .chev{
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--on-black);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Noto Sans TC', sans-serif;
+    margin-left: auto;
+  }
+  .wx-bar .chev .chev-dot{
+    width: 8px; height: 8px; border-radius: 50%; background: var(--blue); flex-shrink: 0;
+    box-shadow: 0 0 0 0 rgba(26,79,180,0.6); animation: wxPulse2 1.6s infinite;
+  }
+  @keyframes wxPulse2{
+    0%{ box-shadow: 0 0 0 0 rgba(26,79,180,0.6); }
+    70%{ box-shadow: 0 0 0 7px rgba(26,79,180,0); }
+    100%{ box-shadow: 0 0 0 0 rgba(26,79,180,0); }
+  }
+  .wx-bar:hover .chev{ color: var(--red); }
+
+  .wx-panel{ display: none; background: #000; }
+  .wx-panel.is-open{ display: block; }
+  .wx-video{
+    position: relative;
+    aspect-ratio: 21 / 7;
+    width: 100%;
+    background: #0e0f12;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .wx-video video{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .wx-video video[hidden]{ display: none; }
+  .wx-video .wx-status{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    border: 1px dashed rgba(255,255,255,0.25);
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 80%;
+  }
+  .wx-video .wx-fallback{
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 14px;
+    color: var(--on-black-dim);
+    text-align: center;
+    max-width: 70%;
+    line-height: 1.7;
+  }
+  .wx-video .wx-fallback a{
+    color: var(--on-black);
+    border-bottom: 1px solid var(--on-black-dim);
+    text-decoration: none;
+  }
+  .wx-video .wx-fallback a:hover{ color: var(--red); border-color: var(--red); }
+  .wx-video .live-badge{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(226,32,44,0.9);
+    color: #fff;
+    font-family: 'Teko', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    padding: 3px 9px 3px 7px;
+    border-radius: 5px;
+  }
+  .wx-video .live-badge .dot{ width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+  .wx-foot{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 22px;
+    border-top: 1px solid var(--on-black-line);
+  }
+  .wx-foot .src{ font-size: 14px; color: var(--on-black-dim); font-family: 'Noto Sans TC', sans-serif; }
+  .wx-foot a{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+  .wx-foot a:hover{ color: var(--red); }
 </style>
 </head>
 <body>
@@ -1075,6 +1258,27 @@
     <p class="lede">
       依比賽日自動更新在以下——馬上開啟最新戰況，點縮圖直接進場觀賽！
     </p>
+
+    <div class="wx-widget">
+      <button class="wx-bar" id="wxBar" type="button" aria-expanded="false" aria-controls="wxPanel">
+        <span class="live-dot" aria-hidden="true"></span>
+        <span class="live-tag">LIVE</span>
+        <span class="sep" aria-hidden="true"></span>
+        <span class="cam-name">環河快・詔安街</span>
+        <span class="chev" id="wxChev"><span class="chev-dot" aria-hidden="true"></span>點看球場即時影像 ▾</span>
+      </button>
+      <div class="wx-panel" id="wxPanel">
+        <div class="wx-video" id="wxVideo">
+          <span class="live-badge"><span class="dot"></span>LIVE</span>
+          <video id="wxVideoEl" muted playsinline autoplay hidden></video>
+          <span class="wx-status" id="wxStatus">影像載入中…</span>
+        </div>
+        <div class="wx-foot">
+          <span class="src">畫面來源：台北市交通局路口監視器</span>
+          <a href="https://www.twipcam.com/cam/tpe-000077" target="_blank" rel="noopener">在 twipcam 看完整版 ↗</a>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2285,6 +2489,84 @@
       return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
     });
   }
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.7.4/hls.min.js"></script>
+<script>
+(function(){
+  // ---- LIVE 即時影像工具列：點開才載入串流，收合只暫停不銷毀 ----
+  var STREAM_URL = 'https://jtmctrafficcctv5.gov.taipei/NVR/8519d752-687e-4fb1-97d2-9349a9b97406/live.m3u8';
+  var FALLBACK_URL = 'https://www.twipcam.com/cam/tpe-000077';
+
+  var widget = document.querySelector('.wx-widget');
+  var bar = document.getElementById('wxBar');
+  var panel = document.getElementById('wxPanel');
+  var chev = document.getElementById('wxChev');
+  var videoEl = document.getElementById('wxVideoEl');
+  var statusEl = document.getElementById('wxStatus');
+
+  var started = false;
+  var hls = null;
+
+  function showFallback(msg){
+    videoEl.hidden = true;
+    statusEl.hidden = false;
+    statusEl.className = 'wx-fallback';
+    statusEl.innerHTML = (msg || '即時影像暫時無法載入。') +
+      '<br><a href="' + FALLBACK_URL + '" target="_blank" rel="noopener">改到 twipcam 看即時影像 ↗</a>';
+  }
+
+  function startStream(){
+    if(started) return;
+    started = true;
+
+    if(window.Hls && window.Hls.isSupported()){
+      try{
+        hls = new window.Hls();
+        hls.on(window.Hls.Events.MANIFEST_PARSED, function(){
+          statusEl.hidden = true;
+          videoEl.hidden = false;
+          videoEl.play().catch(function(){});
+        });
+        hls.on(window.Hls.Events.ERROR, function(evt, data){
+          if(data && data.fatal){
+            showFallback('即時影像載入失敗。');
+          }
+        });
+        hls.loadSource(STREAM_URL);
+        hls.attachMedia(videoEl);
+      } catch(e){
+        showFallback('即時影像載入失敗。');
+      }
+    } else if(videoEl.canPlayType('application/vnd.apple.mpegurl')){
+      // Safari 等原生支援 HLS 的瀏覽器
+      videoEl.src = STREAM_URL;
+      videoEl.addEventListener('loadedmetadata', function(){
+        statusEl.hidden = true;
+        videoEl.hidden = false;
+        videoEl.play().catch(function(){});
+      });
+      videoEl.addEventListener('error', function(){
+        showFallback('即時影像載入失敗。');
+      });
+    } else {
+      showFallback('此瀏覽器不支援即時影像播放。');
+    }
+  }
+
+  bar.addEventListener('click', function(){
+    var open = panel.classList.toggle('is-open');
+    bar.setAttribute('aria-expanded', open ? 'true' : 'false');
+    widget.classList.toggle('is-expanded', open);
+    chev.innerHTML = open ? '收合 ▾' : '<span class="chev-dot" aria-hidden="true"></span>點看球場即時影像 ▾';
+    if(open){
+      startStream();
+      if(started && !videoEl.hidden) videoEl.play().catch(function(){});
+    } else if(started && !videoEl.hidden){
+      videoEl.pause();
+    }
+  });
 })();
 </script>
 </body>
