@@ -444,19 +444,23 @@
   .card:hover .play{ opacity: 1; transform: translate(-50%,-50%) scale(1); }
   .card .play svg{ width: 13px; height: 13px; fill: #fff; margin-left: 2px; }
 
-  .card .tag{
+  .card .time{
     position: absolute;
-    top: 8px; left: 8px;
-    font-family: 'Teko', sans-serif;
-    font-weight: 600;
-    font-size: 16px;
-    letter-spacing: 0.06em;
-    color: #fff;
-    background: var(--red);
+    top: 8px; right: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: rgba(255,255,255,0.92);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    background: rgba(10,10,12,0.5);
     padding: 2px 7px;
     border-radius: 4px;
-    box-shadow: 0 2px 6px -1px rgba(226,32,44,0.5);
+    letter-spacing: 0.01em;
+    white-space: nowrap;
   }
+  .card .time svg{ width: 11px; height: 11px; flex-shrink: 0; opacity: 0.85; }
 
   .card .info{
     position: absolute;
@@ -788,7 +792,7 @@
     .card{ width: 100% !important; height: auto; }
     .card .info{ font-size: 16px; }
     .card .players-tag{ font-size: 16px; }
-    .card .tag{ font-size: 16px; }
+    .card .time{ font-size: 13px; padding: 2px 6px; }
 
 
     .modal{ padding: 6px; }
@@ -1840,6 +1844,13 @@
     activeGoalsController.quickMark();
   });
 
+  // 把實際開打時間（f.__ts）格式化成 24 小時制 HH:MM，兩位數補零。
+  function fmtStartTime(ts){
+    var d = new Date(ts);
+    var hh = d.getHours(), mm = d.getMinutes();
+    return (hh<10?'0':'') + hh + ':' + (mm<10?'0':'') + mm;
+  }
+
   // 把一天的影片清單渲染成卡片列（本月展開的 Game Day、以及過去月份縮圖點開後的明細，共用這份 markup）。
   function renderCardGrid(list, latestTime, CARD_HEIGHT){
     var html = '';
@@ -1848,17 +1859,17 @@
       var w = vmm.width || 16, h = vmm.height || 9;
       var ratio = w / h;
       var widthPx = Math.round(CARD_HEIGHT * ratio);
-      var isLatest = f.__ts === latestTime;
       var dur = fmtDuration(vmm.durationMillis);
+      var startTime = fmtStartTime(f.__ts);
       var thumb = f.thumbnailLink || '';
       html += '<div class="card" style="width:' + widthPx + 'px; aspect-ratio:' + w + '/' + h + '" data-idx="' + f.__idx + '" data-fileid="' + escapeHtml(f.id) + '">';
       if(thumb){
         html += '<img src="' + thumb + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">';
       }
       html += '<div class="scrim"></div>';
-      if(isLatest){ html += '<span class="tag">最新</span>'; }
+      html += '<span class="time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>' + escapeHtml(startTime) + '</span>';
       html += '<div class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>';
-      html += '<div class="info"><span class="players-tag"></span><span class="dur">' + dur + '</span></div>';
+      html += '<div class="info"><span class="players-tag"></span><span class="dur">' + escapeHtml(dur) + '</span></div>';
       html += '</div>';
     });
     return html;
@@ -1913,7 +1924,8 @@
     }
 
     var dayMetas = order.map(function(k, gi){
-      var list = groups[k].slice().sort(function(a, b){ return b.__ts - a.__ts; });
+      // 同一天的影片由舊到新排序（照實際開打時間），讓卡片格由左上到右下自然對應比賽發生順序。
+      var list = groups[k].slice().sort(function(a, b){ return a.__ts - b.__ts; });
       return {
         key: k,
         list: list,
@@ -1967,7 +1979,7 @@
       pastHtml += '<div class="month-grid">';
       bucket.forEach(function(dm){
         var dl = dayLabel(dm.list[0].__ts);
-        var latestOfDay = dm.list[0]; // 已依 __ts 新到舊排序
+        var latestOfDay = dm.list[dm.list.length - 1]; // list 已改為舊到新排序，最後一個才是當天最新
         var thumb = latestOfDay.thumbnailLink || '';
         var gameNo = String(dm.gameNo).padStart(2, '0');
         pastHtml += '<div class="month-tile" data-tilekey="' + escapeHtml(dm.key) + '" data-detail="' + detailId + '">';
