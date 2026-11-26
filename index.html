@@ -2207,13 +2207,23 @@
     applyEraViewCounts();
   }).catch(function(){});
 
+  // Google Sheet 會把 '01' 這種看起來像數字的文字自動轉型存成 1，
+  // 讀回來的 key 可能是去掉前導零的版本，兩種都查一次比較保險。
+  function lookupEraViewCount_(code){
+    if(Object.prototype.hasOwnProperty.call(eraViewCounts, code)) return eraViewCounts[code];
+    var stripped = String(Number(code));
+    if(Object.prototype.hasOwnProperty.call(eraViewCounts, stripped)) return eraViewCounts[stripped];
+    return null;
+  }
+
   function applyEraViewCounts(){
     if(!eraRow) return;
     eraRow.querySelectorAll('[data-view-era]').forEach(function(el){
       var code = el.getAttribute('data-view-era');
-      if(Object.prototype.hasOwnProperty.call(eraViewCounts, code)){
+      var count = lookupEraViewCount_(code);
+      if(count !== null){
         var numEl = el.querySelector('.era-view-num');
-        if(numEl) numEl.textContent = eraFmtCount(eraViewCounts[code]) + ' 次瀏覽';
+        if(numEl) numEl.textContent = eraFmtCount(count) + ' 次瀏覽';
       }
     });
   }
