@@ -108,6 +108,15 @@
     letter-spacing: 0.05em;
     color: var(--on-black-dim);
   }
+  .navbar .season .view-count{
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
+  }
+  .navbar .season .view-count[hidden]{ display: none; }
+  .navbar .season .view-sep{ margin-right: 8px; opacity: 0.6; }
+  .navbar .season .view-count svg{ width: 13px; height: 13px; flex-shrink: 0; opacity: 0.85; }
 
   .hero-body{
     position: relative;
@@ -932,6 +941,8 @@
   .era-card .era-card-title{ font-weight: 700; font-size: 16px; margin-bottom: 4px; }
   .era-card .era-card-desc{ font-size: 16px; line-height: 1.5; color: rgba(255,255,255,0.84); margin-bottom: 6px; }
   .era-card .era-card-count{ font-family: 'JetBrains Mono', monospace; font-size: 16px; color: rgba(255,255,255,0.78); }
+  .era-card .era-card-count .era-view-count{ display: inline-flex; align-items: center; gap: 3px; margin-left: 6px; }
+  .era-card .era-card-count .era-view-count svg{ width: 12px; height: 12px; flex-shrink: 0; opacity: 0.85; }
   .era-card .era-card-tag{
     position: absolute; top: 10px; right: 10px;
     font-size: 10.5px;
@@ -1253,7 +1264,7 @@
   <img class="hero-art" src="hero-court.jpg" alt="">
   <div class="navbar">
     <div class="wordmark">河濱<span class="dot">●</span>NBA</div>
-    <div class="season">2026 SEASON</div>
+    <div class="season">2026 SEASON<span class="view-count" id="siteViewCount" hidden><span class="view-sep">｜</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span id="siteViewNum">0</span></span></div>
   </div>
   <div class="hero-body">
     <div class="eyebrow">2026 · Riverside Playoffs</div>
@@ -1397,6 +1408,37 @@
   // 球員名單跟影片清單是兩個不相干的請求，一進頁面就同時發出去（不等影片清單讀完才開始），
   // 這樣「依球員篩選」那排標籤才不會在畫面上明顯慢一拍才出現。
   var earlyPlayersPromise = apiGet('players').catch(function(){ return null; });
+
+  // ---- Navbar 整頁累計瀏覽數：一進頁面就 +1（含自己這次），不等其他資料載完 ----
+  function fmtCount(n){
+    return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+  (function(){
+    var siteViewWrap = document.getElementById('siteViewCount');
+    var siteViewNum = document.getElementById('siteViewNum');
+    function showSiteViewCount(n){
+      if(!siteViewWrap || !siteViewNum || n == null || isNaN(n)) return;
+      siteViewNum.textContent = fmtCount(n);
+      siteViewWrap.hidden = false;
+    }
+    apiPost('view', { fileId: 'site-total' }).then(function(data){
+      if(data && data.ok && typeof data.count === 'number'){
+        showSiteViewCount(data.count);
+        return;
+      }
+      return apiGet('viewCounts').then(function(d){
+        if(d && d.ok && d.counts && typeof d.counts['site-total'] === 'number'){
+          showSiteViewCount(d.counts['site-total']);
+        }
+      }).catch(function(){});
+    }).catch(function(){
+      return apiGet('viewCounts').then(function(d){
+        if(d && d.ok && d.counts && typeof d.counts['site-total'] === 'number'){
+          showSiteViewCount(d.counts['site-total']);
+        }
+      }).catch(function(){});
+    });
+  })();
   var usedEarlyPlayers = false;
   function getPlayersData(){
     if(!usedEarlyPlayers){
@@ -2143,6 +2185,39 @@
     { code:'04', title:'我的NBA年代', desc:'場邊幕後花絮和精彩回放，陸續更新中，敬請期待！', badge:'本放死守', tag:'真實影片', isVideo:true, folderId:'1_2IKNnWzvdMjyXOTe51jj9a8IABkzwNH' }
   ];
 
+  // ---- 相簿瀏覽次數：沿用跟 getOrder/setOrder 同一支 Apps Script，action 是 view / viewCounts ----
+  function eraFmtCount(n){
+    return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+  function eraApiGet(action){
+    return fetch(APPS_SCRIPT_URL + '?action=' + action).then(function(r){ return r.json(); });
+  }
+  function eraApiPost(action, body){
+    var payload = Object.assign({ action: action }, body);
+    return fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    }).then(function(r){ return r.json(); });
+  }
+  var ERA_VIEW_EYE_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+  var eraViewCounts = {}; // code -> count，載完後補進已渲染的卡片，不會卡住卡片渲染
+  var earlyEraViewCountsPromise = eraApiGet('viewCounts').then(function(d){
+    if(d && d.ok && d.counts) eraViewCounts = d.counts;
+    applyEraViewCounts();
+  }).catch(function(){});
+
+  function applyEraViewCounts(){
+    if(!eraRow) return;
+    eraRow.querySelectorAll('[data-view-era]').forEach(function(el){
+      var code = el.getAttribute('data-view-era');
+      if(Object.prototype.hasOwnProperty.call(eraViewCounts, code)){
+        var numEl = el.querySelector('.era-view-num');
+        if(numEl) numEl.textContent = eraFmtCount(eraViewCounts[code]) + ' 次瀏覽';
+      }
+    });
+  }
+
   var editUnlocked = false; // 編輯模式解鎖狀態不持久化，重新整理後要重輸入
 
   var eraLock = document.getElementById('eraLock');
@@ -2259,7 +2334,12 @@
       html += '<div class="era-card-info">';
       html += '<div class="era-card-title">' + escapeHtml(era.title) + '</div>';
       html += '<div class="era-card-desc">' + escapeHtml(era.desc) + '</div>';
-      html += '<div class="era-card-count">' + (era.isVideo ? '🎬 ' + count + ' 支影片' : '📷 ' + count + ' 張照片') + '</div>';
+      var viewText = Object.prototype.hasOwnProperty.call(eraViewCounts, era.code)
+        ? eraFmtCount(eraViewCounts[era.code]) + ' 次瀏覽'
+        : '0 次瀏覽';
+      html += '<div class="era-card-count">' + (era.isVideo ? '🎬 ' + count + ' 支影片' : '📷 ' + count + ' 張照片') +
+        '・<span class="era-view-count" data-view-era="' + escapeHtml(era.code) + '">' + ERA_VIEW_EYE_SVG +
+        '<span class="era-view-num">' + viewText + '</span></span></div>';
       html += '</div></div>';
     });
     eraRow.innerHTML = html;
@@ -2280,6 +2360,16 @@
   var pendingEra = null;
   var browseUnlocked = (localStorage.getItem('photoGalleryUnlocked') === '1');
 
+  function bumpEraViewCount(era){
+    eraApiPost('view', { fileId: era.code }).then(function(data){
+      if(data && data.ok && typeof data.count === 'number'){
+        eraViewCounts[era.code] = data.count;
+        var card = eraRow.querySelector('[data-view-era="' + era.code + '"] .era-view-num');
+        if(card) card.textContent = eraFmtCount(data.count) + ' 次瀏覽';
+      }
+    }).catch(function(){});
+  }
+
   function openAlbum(era){
     if(!browseUnlocked){
       pendingEra = era;
@@ -2289,6 +2379,7 @@
       eraLockInput.focus();
       return;
     }
+    bumpEraViewCount(era);
     currentEra = era;
     era.savedOrder = null;
     eraAlbumTitle.textContent = era.title + (era.isVideo
